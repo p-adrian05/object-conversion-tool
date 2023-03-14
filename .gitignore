@@ -8,6 +8,7 @@
 .localdevserver/
 deploy-options.json
 .idea
+IlluminatedCloud
 # LWC VSCode autocomplete
 **/lwc/jsconfig.json
 
