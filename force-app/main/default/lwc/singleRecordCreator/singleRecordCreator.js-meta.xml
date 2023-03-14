@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>57.0</apiVersion>
+    <description>Single Record Creator</description>
+    <isExposed>true</isExposed>
+    <masterLabel>Single Record Creator</masterLabel>
+    <targets>
+        <target>lightning__FlowScreen</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightning__FlowScreen">
+            <property name="sourceRecordId" type="String" label="Source Record Id"
+                      description="Source record that is used as the source of the conversion"/>
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

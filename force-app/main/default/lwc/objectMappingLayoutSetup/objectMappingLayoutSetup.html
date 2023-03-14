@@ -1,0 +1,56 @@
+
+<template>
+    <lightning-card  class="slds-align_absolute-center" >
+        <template if:true={isLoading}>
+            <lightning-spinner alternative-text="Loading" variant="brand"></lightning-spinner>
+        </template>
+        <div class="slds-align_absolute-center"  style="width: 30rem;">
+            <div  class="slds-p-right_large slds-m-right_large" >
+                <lightning-layout horizontal-align="spread" class="slds-m-bottom_medium">
+                <lightning-layout-item >
+                    <lightning-button variant="brand" label="Save" onclick={handleSaveButtonClick}></lightning-button>
+                </lightning-layout-item>
+                <lightning-layout-item >
+                    <lightning-button variant="neutral" label="Clear" onclick={handleResetButtonClick}></lightning-button>
+                </lightning-layout-item>
+                <lightning-layout-item >
+                    <lightning-button variant="destructive" label="Delete" onclick={handleDeleteButtonClick}></lightning-button>
+                </lightning-layout-item>
+            </lightning-layout>
+
+                <lightning-layout>
+                    <lightning-layout-item flexibility="grow"  class="slds-p-right_small">
+                        <lightning-combobox
+
+                                value={selectedMappingLayoutId}
+                                placeholder="Select Layout"
+                                options={mappingLayoutOptions}
+                                onchange={handleMappingLayoutOptionChange}
+                        ></lightning-combobox>
+                    </lightning-layout-item>
+                    <lightning-layout-item  flexibility="grow"  class="slds-p-left_small ">
+                        <lightning-input
+                                          type="text"
+                                          placeholder="Enter Layout Name"
+                                          label=""
+                                          max-length="255"
+                                          value={mappingLayoutName}
+                                          onchange={handleMappingLayoutNameInputChange}>
+                        </lightning-input>
+                    </lightning-layout-item>
+                </lightning-layout>
+                    <lightning-textarea
+                            id="descriptionInput"
+                            placeholder="Enter description"
+                            max-length="255"
+                            value={mappingLayoutDescription}
+                            onchange={handleMappingLayoutDescriptionChange}
+                            label="">
+                    </lightning-textarea>
+            </div>
+
+        </div>
+            <c-object-mapping-layout layout-record-id={selectedMappingLayoutId}>
+            </c-object-mapping-layout>
+    </lightning-card>
+</template>

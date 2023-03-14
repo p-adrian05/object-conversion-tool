@@ -1,0 +1,40 @@
+<template>
+
+        <lightning-combobox class="validate"
+                            name={fieldData.labelName}
+                            label=""
+                            value={fieldData.apiName}
+                            placeholder="Select field"
+                            required
+                            disabled={disabled}
+                            options={fieldOptions}
+                            onchange={handleFieldOptionChange}
+        ></lightning-combobox>
+        <template if:true={fieldData.type}>
+            <div class="slds-m-left_xx-small">
+                <div style="font-size:.7rem" >{fieldData.type}</div>
+                <div style="font-size:.7rem" >{fieldData.apiName}</div>
+                <div style="font-size:.7rem">{fieldData.referenceTo}</div>
+            </div>
+        </template>
+        <template if:false= {disabledActive}>
+            <template if:true={fieldData}>
+                <template if:true={fieldData.referenceTo}>
+                    <lightning-layout>
+                            <lightning-layout-item class="slds-m-top_medium slds-p-top_xx-small">
+                                <lightning-icon
+                                        icon-name="utility:level_down"
+                                        alternative-text="level down"
+                                        title="level down" >
+                                </lightning-icon>
+                            </lightning-layout-item>
+                            <lightning-layout-item  >
+                                <c-object-field child-field={fieldData} onfieldchange={handleFieldOptionChangeOnChild}></c-object-field>
+                            </lightning-layout-item>
+                    </lightning-layout>
+                </template>
+
+            </template>
+        </template>
+
+</template>

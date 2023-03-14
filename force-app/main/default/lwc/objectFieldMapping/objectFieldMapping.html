@@ -1,0 +1,34 @@
+<template>
+    <lightning-layout multiple-rows="true" horizontal-align="end">
+        <lightning-layout-item flexibility="grow">
+            <c-object-field field-data= {fieldMappingData.sourceObjectField}
+                            fields={sourceObjectFields}
+                            onfieldchange={handleSourceObjectFieldChange}
+                            >
+            </c-object-field>
+        </lightning-layout-item>
+        <lightning-layout-item flexibility="auto" class="slds-p-around_medium slds-m-top_x-small">
+            <lightning-icon
+                    icon-name="standard:output"
+                    alternative-text="No data found"
+                    title="No data found" >
+
+            </lightning-icon>
+        </lightning-layout-item>
+        <lightning-layout-item flexibility="grow">
+            <c-object-field field-data= {fieldMappingData.targetObjectField}
+                            fields={targetObjectFields}
+                            onfieldchange={handleTargetObjectFieldChange}
+                            disabled-active="false">
+            </c-object-field>
+        </lightning-layout-item>
+        <lightning-layout-item  flexibility="auto" class="slds-p-top_medium slds-m-top_x-small">
+            <lightning-button-icon
+                    icon-name="action:remove"
+                    alternative-text="Delete"
+                    onclick={handleDeleteFieldMappingData}
+                    class="slds-m-left_xx-small"
+                    title="Delete"></lightning-button-icon>
+        </lightning-layout-item>
+    </lightning-layout>
+</template>

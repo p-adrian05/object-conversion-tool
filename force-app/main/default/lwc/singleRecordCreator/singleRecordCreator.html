@@ -1,0 +1,45 @@
+
+
+<template>
+    <template if:true={isLoading}>
+        <lightning-spinner alternative-text="Loading"></lightning-spinner>
+    </template>
+
+    <div class="slds-align_absolute-center">
+        <template if:true={selectedObjectMappingLayoutId}>
+            <template if:false={selectedObjectMappingLayoutIsDefault}>
+                <lightning-layout >
+                    <lightning-button variant="neutral" label="Mark Default" onclick={handleDefaultButtonClick}></lightning-button>
+                </lightning-layout>
+            </template>
+            <template if:true={selectedObjectMappingLayoutIsDefault}>
+                <lightning-layout >
+                    <lightning-button variant="neutral" label="Default Selected" disabled></lightning-button>
+                </lightning-layout>
+            </template>
+        </template>
+    </div>
+    <div class="slds-align_absolute-center">
+        <lightning-layout >
+            <c-object-mapping-layout-selector
+                    onselectedlayoutchange={handleMappingLayoutChange}
+                    object-mapping-layouts= {objectMappingLayouts}
+            ></c-object-mapping-layout-selector>
+        </lightning-layout>
+    </div>
+
+    <div class="slds-align_absolute-center">
+        <lightning-layout class="slds-p-top_medium" >
+            <template if:false= {createdTargetRecordId}>
+                <lightning-layout-item>
+                    <lightning-button  variant="brand" label="Convert" onclick={handleConvertButtonClick}></lightning-button>
+                </lightning-layout-item>
+            </template>
+            <template if:true= {createdTargetRecordId}>
+                <lightning-layout-item>
+                    <lightning-button  variant="success" label="View Created Record" onclick={handleViewCreatedRecordButtonClick}></lightning-button>
+                </lightning-layout-item>
+            </template>
+        </lightning-layout>
+    </div>
+</template>

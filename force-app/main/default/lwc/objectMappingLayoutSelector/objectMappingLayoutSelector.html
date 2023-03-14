@@ -1,0 +1,20 @@
+
+<template>
+    <div style="width: 20rem">
+        <lightning-combobox
+                value={selectedObjectMappingLayoutId}
+                placeholder="Select Layout"
+                options={objectMappingLayoutOptions}
+                onchange={handleObjectMappingLayoutOptionChange}
+                validity="">
+        </lightning-combobox>
+        <lightning-textarea
+                placeholder="No description"
+                max-length="255"
+                value={objectMappingLayoutDescription}
+                label=""
+                read-only="true">
+        </lightning-textarea>
+    </div>
+
+</template>

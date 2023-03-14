@@ -1,0 +1,57 @@
+<template>
+    <lightning-card title={title} class="slds-card_boundary  slds-align_absolute-center">
+        <div class="slds-p-around_medium">
+            <lightning-layout horizontal-align="spread" class="slds-m-bottom_medium">
+                <lightning-layout-item >
+                    <lightning-button variant="brand" label="Save" onclick={handleSaveButtonClick}></lightning-button>
+                </lightning-layout-item>
+                <lightning-layout-item >
+                    <lightning-button variant="neutral" label="Clear" disabled={templateSelectDisable} onclick={handleResetButtonClick}></lightning-button>
+                </lightning-layout-item>
+                <lightning-layout-item >
+                    <lightning-button variant="neutral" label="Reload" onclick={handleRestoreButtonClick}></lightning-button>
+                </lightning-layout-item>
+                <lightning-layout-item >
+                    <lightning-button variant="destructive" label="Delete" disabled={templateSelectDisable} onclick={handleDeleteModalClick}></lightning-button>
+                </lightning-layout-item>
+            </lightning-layout>
+
+            <template if:true={isLoading}>
+                <lightning-spinner alternative-text="Loading" variant="brand"></lightning-spinner>
+            </template>
+            <lightning-layout horizontal-align="spread">
+                <lightning-layout-item flexibility="grow" class="slds-p-right_small">
+                    <lightning-combobox
+                                name="objectMappingTemplates"
+                                value={selectedMappingTemplateId}
+                                placeholder="Select Template"
+                                options={mappingTemplateOptions}
+                                disabled={templateSelectDisable}
+                                onchange={handleMappingTemplateOptionChange}
+                    ></lightning-combobox>
+                </lightning-layout-item>
+                <lightning-layout-item flexibility="grow" class="slds-p-left_small ">
+                    <lightning-input id="mappingTemplateNameInput"
+                                     type="text"
+                                     placeholder="Enter name"
+                                     label=""
+                                     disabled={templateSelectDisable}
+                                     max-length="255"
+                                     value={selectedMappingTemplateName}
+                                     onchange={handleMappingTemplateNameInputChange}>
+
+                    </lightning-input>
+                </lightning-layout-item>
+            </lightning-layout>
+
+            <c-object-mapping-form onloading={handleLoading}
+                                   ondoneloading={handleDoneLoading}
+                                   onmappingtemplateloaded={handleTemplateLoaded}
+                                    source-object-api-names= {sourceObjectApiNames}
+                                   target-object-api-names= {targetObjectApiNames}
+            ></c-object-mapping-form>
+
+        </div>
+    </lightning-card>
+
+</template>

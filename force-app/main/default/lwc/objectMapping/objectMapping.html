@@ -1,0 +1,56 @@
+
+<template>
+    <div class="slds-p-around_large" >
+
+            <lightning-layout horizontal-align="space">
+                <template if:true={isChild}>
+                    <lightning-layout-item class="slds-p-bottom_large">
+                  <c-object-child-relationship-selector
+                          data-id="sourceObjectRelationshipSelector"
+                          parent-object-api-name={parentSourceObjectApiName}
+                          child-object-api-name={selectedSourceObjectApiName}
+                          source-object-selector="true">
+                  </c-object-child-relationship-selector>
+                </lightning-layout-item>
+                    <lightning-layout-item class="slds-p-bottom_large">
+                        <c-object-child-relationship-selector
+                                data-id="targetObjectRelationshipSelector"
+                                parent-object-api-name={parentTargetObjectApiName}
+                                child-object-api-name={selectedTargetObjectApiName}>
+                        </c-object-child-relationship-selector>
+                    </lightning-layout-item>
+                    <lightning-button-icon icon-name="action:remove" variant="border-filled" style="margin-top: 1.2rem" onclick={handleRemoveMappingButton}></lightning-button-icon>
+                </template>
+            </lightning-layout>
+
+
+        <lightning-layout horizontal-align="center" vertical-align="center">
+
+
+            <lightning-layout-item >
+                <c-object-mapping-table onmappingtemplatechange={handleMappingTemplateChange}
+                                        source-object-api-names= {parentRelatedSourceObjectApiNames}
+                                        target-object-api-names= {parentRelatedTargetObjectApiNames}
+                                        template-select-disable={templateSelectDisable}>
+                </c-object-mapping-table>
+            </lightning-layout-item>
+        </lightning-layout>
+
+        <template if:true={showAddFiltersButton}>
+            <template if:true= {isChild}>
+                <lightning-layout horizontal-align="center" class="slds-m-around_medium">
+                    <lightning-button-icon icon-name="utility:filterList" variant="border-filled" disabled={disableAddFiltersButton} onclick={handleAddFilterButton}></lightning-button-icon>
+                </lightning-layout>
+            </template>
+        </template>
+
+        <template if:true={showFilters}>
+            <lightning-layout horizontal-align="center" class="slds-m-around_medium">
+                <lightning-layout-item >
+                    <c-object-filter object-api-name={selectedSourceObjectApiName}>
+                    </c-object-filter>
+                </lightning-layout-item>
+            </lightning-layout>
+        </template>
+    </div>
+</template>
