@@ -1,5 +1,5 @@
 # Object Conversion Tool
-<a href="https://login.salesforce.com/packaging/installPackage.apexp?p0=04t68000000t30LAAQ">
+<a href="https://login.salesforce.com/packaging/installPackage.apexp?p0=04t68000000t30aAAA">
 <img alt="Deploy to Salesforce"
 src="https://raw.githubusercontent.com/afawcett/githubsfdeploy/master/deploy.png">
 </a>
@@ -47,7 +47,4 @@ and the ability to save, load and clear the layout configurations.
 
 ![img.png ](./documentation/images/limits.png)
 
-- Code coverage:
-
-![img.png ](./documentation/images/code_coverage.png)
 
