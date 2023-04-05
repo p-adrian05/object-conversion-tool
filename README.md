@@ -1,5 +1,5 @@
 # Object Conversion Tool
-<a href="https://login.salesforce.com/packaging/installPackage.apexp?p0=04t68000000t30LAAQ">
+<a href="https://login.salesforce.com/packaging/installPackage.apexp?p0=04t68000000t30QAAQ">
 <img alt="Deploy to Salesforce"
 src="https://raw.githubusercontent.com/afawcett/githubsfdeploy/master/deploy.png">
 </a>
