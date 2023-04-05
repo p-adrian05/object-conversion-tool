@@ -1,4 +1,3 @@
-
 @IsTest
 public with sharing class ObjectMappingTemplateConverterTest {
 

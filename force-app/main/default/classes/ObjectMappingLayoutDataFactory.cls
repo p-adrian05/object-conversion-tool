@@ -89,13 +89,12 @@ public with sharing class ObjectMappingLayoutDataFactory {
 
         Object_Mapping__c childObjectMapping = ObjectMappingLayoutDataFactory.createObjectMapping(mappingLayout.Id,childObjectMappingTemplate.Id, false);
         childObjectMapping.External_Id__c = 'Test_External_Id__c';
-        childObjectMapping.Filter_State_JSON__c = '{"logicalCondition":"AND","filterString":" Quantity = 2 ",' +
-                '"filterList":[{"operatorValue":"2","operator":"=","index":"1",' +
-                '"id":"1676903873233","field":{"type":"DOUBLE","required":true,"referenceTo":null,' +
-                '"parentField":null,"labelName":"Quantity","apiName":"Quantity"}}],"customLogicalCondition":"1"}';
+        childObjectMapping.Filter_State_JSON__c = '{"logicalCondition":"AND","filterString":" Quantity = 2 ", "filterStringWithBinds":"Quantity = :value1",' +
+                '"filterList":[{"operatorValue":"2","bindVariable":"value1","operator":"=","index":"1","id":"1676903873233",' +
+                '"field":{"type":"DOUBLE","required":true,"referenceTo":null,"parentField":null,"labelName":"Quantity","apiName":"Quantity"}}],' +
+                '"logicalOrder":"1"}';
         childObjectMapping.Source_Object_Relationship_JSON__c = '{"relationshipName":"OpportunityLineItems","fieldApiName":"OpportunityId"}';
         childObjectMapping.Target_Object_Relationship_JSON__c = '{"relationshipName":"OrderItems","fieldApiName":"OrderId"}';
-        childObjectMapping.Filter_Condition__c = 'Quantity = 2';
         insert childObjectMapping;
 
         //update mappingLayout

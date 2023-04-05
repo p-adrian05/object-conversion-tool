@@ -34,6 +34,7 @@ public with sharing class ObjectMappingTemplateConverterImpl implements ObjectMa
             // Create a new target record
             SObject targetRecord = (SObject) System.Type.forName(objectMappingTemplate.targetObjectApiName)
                     .newInstance();
+            //System.debug('Source Record: ' + sourceRecord.Id);
             // Map the source fields to the target fields
             for (FieldMapping fieldMapping : objectMappingTemplate.fieldMappings) {
                 validateFieldMapping(fieldMapping);
@@ -41,7 +42,6 @@ public with sharing class ObjectMappingTemplateConverterImpl implements ObjectMa
                 String sourceFieldName = fieldMapping.sourceObjectField.toSOQLFieldName();
                 String targetFieldName = fieldMapping.targetObjectField.toSOQLFieldName();
 
-                //System.debug('Source Record: ' + sourceRecord.Id);
                 //System.debug('Source Field: ' + sourceFieldName + ' Target Field: ' + targetFieldName);
                 // Get the value of the source field
                 Object sourceFieldValue = getFieldValueFromSObject(sourceFieldName,sourceRecord);
@@ -93,11 +93,7 @@ public with sharing class ObjectMappingTemplateConverterImpl implements ObjectMa
             }
         }
         //build the query string
-        List<String> sourceRecordFields = new List<String>();
-        for(FieldMapping fieldMapping: objectMappingTemplate.fieldMappings){
-            validateFieldMapping(fieldMapping);
-            sourceRecordFields.add(fieldMapping.sourceObjectField.toSOQLFieldName());
-        }
+        List<String> sourceRecordFields = objectMappingTemplate.getSourceObjectFieldApiNames();
 
         String queryStr = 'SELECT ' + String.join(sourceRecordFields,',') +
                 ' FROM '+objectMappingTemplate.sourceObjectApiName +

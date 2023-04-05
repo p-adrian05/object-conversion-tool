@@ -1,29 +1,25 @@
-
 public with sharing class ObjectMappingLayoutConverterServiceImpl implements ObjectMappingLayoutConverterService {
 
     private final ObjectMappingTemplateConverter objectMappingTemplateConverter;
-    private final ObjectMappingLayoutService objectMappingLayoutService;
-    public ObjectMappingLayoutConverterServiceImpl(ObjectMappingTemplateConverter objectMappingTemplateConverter,
-                                                    ObjectMappingLayoutService objectMappingLayoutService){
 
+    public ObjectMappingLayoutConverterServiceImpl(ObjectMappingTemplateConverter objectMappingTemplateConverter){
         ObjectUtil.requireNonNull(objectMappingTemplateConverter,'objectMappingTemplateConverter cannot be null!');
-        ObjectUtil.requireNonNull(objectMappingLayoutService,'objectMappingLayoutService cannot be null!');
-
         this.objectMappingTemplateConverter = objectMappingTemplateConverter;
-        this.objectMappingLayoutService = objectMappingLayoutService;
     }
     /**
-        Converts an SObject record and its related records using the specified object mapping layout.
+         Converts an SObject record and its related records using the specified object mapping layout.
 
-        @param sourceRecordId the ID of the source record to be converted
-        @param objectMappingLayoutId the ID of the object mapping layout to be used for the conversion
-        @return an ObjectConversionResult object that contains the converted parent record and a list of converted related child records.
-    */
-    public ObjectConversionResult convertObject(Id sourceRecordId,Id objectMappingLayoutId){
+         @param sourceRecordId the ID of the source record to be converted
+         @param objectMappingLayoutId the ID of the object mapping layout to be used for the conversion
+         @param objectMappingLayoutService the object mapping layout service to be used to retrieve the object mapping layout
+         @return an ObjectConversionResult object that contains the converted parent record and a list of converted related child records.
+     */
+    public ObjectConversionResult convertObject(Id sourceRecordId,Id objectMappingLayoutId,ObjectMappingLayoutService objectMappingLayoutService){
         ObjectUtil.requireNonNull(sourceRecordId,'sourceRecordId cannot be null to convert an object!');
         ObjectUtil.requireNonNull(objectMappingLayoutId,'objectMappingLayoutId cannot be null to convert an object!');
+        ObjectUtil.requireNonNull(objectMappingLayoutService,'objectMappingLayoutService cannot be null!');
 
-        ObjectMappingLayout objectMappingLayout = this.objectMappingLayoutService.getObjectMappingLayoutForConversion(objectMappingLayoutId);
+        ObjectMappingLayout objectMappingLayout = objectMappingLayoutService.getObjectMappingLayoutForConversion(objectMappingLayoutId);
 
         ObjectUtil.requireNonNull(objectMappingLayout,'No object mapping layout found for id: '+objectMappingLayoutId);
         return convertObject(sourceRecordId,objectMappingLayout);
@@ -140,21 +136,32 @@ public with sharing class ObjectMappingLayoutConverterServiceImpl implements Obj
         ObjectUtil.requireNonNull(sourceParentRecordId,'sourceParentRecordId cannot be null!');
         validateChildObjectMapping(objectMapping);
 
+        List<SObject> relatedRecords = new List<SObject>();
+        Map<String,Object> objectFilterBinds = new Map<String,Object>{'sourceParentRecordId' => sourceParentRecordId};
+        String objectFilterString;
+
         ObjectRelationship sourceObjectRelationship = objectMapping.sourceObjectRelationship;
         String sourceObjectApiName = objectMapping.template.sourceObjectApiName;
         String sourceObjectFieldApiNames = String.join(objectMapping.template.getSourceObjectFieldApiNames(),',');
-        String objectFilterString = objectMapping.filterString;
 
-        List<SObject> relatedRecords = new List<SObject>();
+        if(objectMapping.filterState!=null){
+            objectFilterString = objectMapping.filterState.filterStringWithBinds;
+            objectFilterBinds.putAll(objectMapping.filterState.getBindVariables());
+        }
 
         //build query string
         String queryStr = 'SELECT '+sourceObjectFieldApiNames + ' FROM '+sourceObjectApiName+' ' +
                 'WHERE '+sourceObjectRelationship.fieldApiName+'=:sourceParentRecordId ';
         //add filter string if specified
-        if(objectFilterString!=null && objectFilterString!=''){
-            queryStr += ' AND ('+objectFilterString+')';
+        if(objectFilterString!=null && objectFilterString.trim()!=''){
+            if(objectFilterBinds.size()==1){
+                throw new SObjectException('Filters must contain at least one bind variable! '+objectFilterString);
+            }
+            queryStr += ' AND ('+String.escapeSingleQuotes(objectFilterString)+')';
         }
-        for(SObject sourceRecord:Database.query(queryStr)){
+        System.debug('Related records query: '+queryStr);
+        System.debug('Bind variables map: '+objectFilterBinds);
+        for(SObject sourceRecord:Database.queryWithBinds(queryStr,objectFilterBinds,AccessLevel.SYSTEM_MODE)){
             relatedRecords.add(sourceRecord);
         }
         return relatedRecords;
@@ -186,4 +193,5 @@ public with sharing class ObjectMappingLayoutConverterServiceImpl implements Obj
                     +objectMapping.sourceObjectRelationship+' => '+objectMapping.targetObjectRelationship);
         }
     }
+
 }

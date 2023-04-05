@@ -1,13 +1,8 @@
-
 public with sharing class ObjectMappingLayoutController {
     @TestVisible
     private static ObjectMappingLayoutService OBJECT_MAPPING_LAYOUT_SERVICE = new ObjectMappingLayoutServiceImpl();
     @TestVisible
     private static ObjectMappingLayoutUpsertService OBJECT_MAPPING_LAYOUT_UPSERT_SERVICE = new ObjectMappingLayoutUpsertServiceImpl();
-    @TestVisible
-    private static ObjectMappingLayoutConverterService OBJECT_MAPPING_LAYOUT_CONVERTER_SERVICE =
-                            new ObjectMappingLayoutConverterServiceImpl(new ObjectMappingTemplateConverterImpl(),
-                                                                        OBJECT_MAPPING_LAYOUT_SERVICE);
     /**
      * @return a list of all the ObjectMappingLayout records with the following fields:
     * Example:
@@ -242,25 +237,6 @@ public with sharing class ObjectMappingLayoutController {
         }
         return 'Layout successfully set to default on '+objectMappingLayoutId.getSobjectType().getDescribe().getName()
                 +' '+ objectMappingLayoutId;
-    }
-    /**
-     * Converts the source record using the ObjectMappingLayout record with the given ID.
-     *
-     * @param sourceRecordId The ID of the source record to convert.
-     * @param objectMappingLayoutId The ID of the ObjectMappingLayout record to use for conversion.
-     * @return The ID of the converted record, or null if no records were converted.
-     */
-    @AuraEnabled
-    public static Id convertObject(Id sourceRecordId, Id objectMappingLayoutId) {
-        ObjectUtil.requireNonNull(sourceRecordId, 'SourceRecordId cannot be null to convert an object');
-        ObjectUtil.requireNonNull(objectMappingLayoutId, 'ObjectMappingLayoutId cannot be null to convert an object');
-        try{
-            ObjectConversionResult conversionResult = OBJECT_MAPPING_LAYOUT_CONVERTER_SERVICE.convertObject(sourceRecordId, objectMappingLayoutId);
-            return conversionResult.parentRecord?.Id;
-        }catch (Exception e){
-            System.debug(e.getMessage());
-            throw new AuraHandledException(e.getMessage());
-        }
     }
     /**
       * Response class for the upsertMappingLayout method.

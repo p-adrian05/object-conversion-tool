@@ -1,5 +1,3 @@
-
-
 public interface ObjectMappingTemplateService {
     /**
         Upserts the specified Object_Mapping_Template__c record represented in ObjectMappingTemplate object.

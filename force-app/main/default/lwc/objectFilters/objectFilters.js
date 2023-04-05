@@ -1,4 +1,3 @@
-
 import {api, LightningElement} from 'lwc';
 
 export default class ObjectFilters extends LightningElement {

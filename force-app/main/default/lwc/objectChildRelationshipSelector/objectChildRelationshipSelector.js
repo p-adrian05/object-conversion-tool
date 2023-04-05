@@ -1,4 +1,3 @@
-
 import {api, LightningElement, track, wire} from 'lwc';
 import getChildRelationships from '@salesforce/apex/ObjectUtilController.getObjectRelationships';
 import {reduceErrors, showErrorMessage} from "c/errorHandlingUtils";

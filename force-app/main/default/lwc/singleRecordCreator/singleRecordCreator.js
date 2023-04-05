@@ -1,8 +1,7 @@
-
 import {api, LightningElement, track, wire} from 'lwc';
 import getMappingLayoutsBySourceRecordId from '@salesforce/apex/ObjectMappingLayoutController.getObjectMappingLayoutsBySourceRecordId';
 import {showErrorMessage,reduceErrors,showSuccessMessage} from 'c/errorHandlingUtils';
-import convertObject from '@salesforce/apex/ObjectMappingLayoutController.convertObject';
+import convertObjectFromLayout from '@salesforce/apex/ObjectMappingConverterController.convertObjectFromLayout';
 import markDefaultLayout from '@salesforce/apex/ObjectMappingLayoutController.markDefaultLayout';
 import {NavigationMixin} from "lightning/navigation";
 import {refreshApex} from "@salesforce/apex";
@@ -52,7 +51,7 @@ export default class SingleRecordCreator extends NavigationMixin(LightningElemen
     handleConvertButtonClick(event){
         if(this.selectedObjectMappingLayoutId){
             this.isLoading = true;
-            convertObject({sourceRecordId: this.sourceRecordId,
+            convertObjectFromLayout({sourceRecordId: this.sourceRecordId,
                 objectMappingLayoutId: this.selectedObjectMappingLayoutId})
                 .then(result=>{
                     if(result){

@@ -1,4 +1,3 @@
-
 public interface ObjectMappingLayoutService {
 
     /**
@@ -14,7 +13,7 @@ public interface ObjectMappingLayoutService {
     ObjectMappingLayout getObjectMappingLayoutForDisplay(Id objectMappingLayoutId);
     /**
       * Retrieves an Object_Mapping_Layout__c represented as ObjectMappingLayout object by its Id with Id field
-      * with related ObjectMappings (Object_Mapping__c) object with fields Id,Filter_Condition__c
+      * with related ObjectMappings (Object_Mapping__c) object with fields Id,Filter_State_JSON__c
       * and with related ObjectMappingTemplate (Object_Mapping_Template__c) object with fields Id, Source_Object_Api_Name__c,
        * Target_Object_Api_Name__c and Mapping_Data__c.
       *

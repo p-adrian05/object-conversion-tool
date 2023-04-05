@@ -1,4 +1,3 @@
-
 @IsTest
 private class ObjectMappingLayoutConverterServiceTest {
 
@@ -25,10 +24,8 @@ private class ObjectMappingLayoutConverterServiceTest {
         objectMappingLayoutModel.parentMapping = accountToContactMapping;
 
         //setting up the stubs
-        Stub objectMappingLayoutServiceStub = new Stub(ObjectMappingLayoutService.class);
         ObjectMappingLayoutConverterServiceImpl objectMappingLayoutConverterService =
-                new ObjectMappingLayoutConverterServiceImpl(new ObjectMappingTemplateConverterImpl(),
-                        (ObjectMappingLayoutService) objectMappingLayoutServiceStub.instance);
+                new ObjectMappingLayoutConverterServiceImpl(new ObjectMappingTemplateConverterImpl());
 
         //When
         ObjectConversionResult objectConversionResult = objectMappingLayoutConverterService.convertObject(sourceAccount.Id,objectMappingLayoutModel);
@@ -66,11 +63,11 @@ private class ObjectMappingLayoutConverterServiceTest {
         Stub objectMappingLayoutServiceStub = new Stub(ObjectMappingLayoutService.class);
         objectMappingLayoutServiceStub.setReturnValue('getObjectMappingLayoutForConversion',objectMappingLayoutModel);
         ObjectMappingLayoutConverterServiceImpl objectMappingLayoutConverterService =
-                new ObjectMappingLayoutConverterServiceImpl(new ObjectMappingTemplateConverterImpl(),
-                        (ObjectMappingLayoutService) objectMappingLayoutServiceStub.instance);
+                new ObjectMappingLayoutConverterServiceImpl(new ObjectMappingTemplateConverterImpl());
 
         //When
-        ObjectConversionResult objectConversionResult = objectMappingLayoutConverterService.convertObject(sourceAccount.Id,objectMappingLayoutModel.id);
+        ObjectConversionResult objectConversionResult = objectMappingLayoutConverterService.convertObject(sourceAccount.Id,
+                            objectMappingLayoutModel.id,(ObjectMappingLayoutService) objectMappingLayoutServiceStub.instance);
 
         //Then
         Assert.areEqual(0,objectConversionResult.relatedRecords.size());
@@ -107,14 +104,10 @@ private class ObjectMappingLayoutConverterServiceTest {
         attachmentChildMapping.sourceObjectRelationship = new ObjectRelationship('Contracts','AccountId');
         attachmentChildMapping.targetObjectRelationship = new ObjectRelationship('ContractsSigned','CustomerSignedId');
 
-        //setting up the stubs
-        Stub objectMappingLayoutServiceStub = new Stub(ObjectMappingLayoutService.class);
-
         ObjectMappingLayoutConverterServiceImpl objectMappingLayoutConverterService =
-                new ObjectMappingLayoutConverterServiceImpl(new ObjectMappingTemplateConverterImpl(),
-                        (ObjectMappingLayoutService) objectMappingLayoutServiceStub.instance);
+                new ObjectMappingLayoutConverterServiceImpl(new ObjectMappingTemplateConverterImpl());
 
-        //When
+        //Whem
         List<SObject> targetChildRecords = objectMappingLayoutConverterService.convertRelatedRecords(sourceParentAccount.Id,targetParentContact.Id,
                                                                         new List<ObjectMapping>{attachmentChildMapping});
 
@@ -157,16 +150,13 @@ private class ObjectMappingLayoutConverterServiceTest {
         contactChildMapping.template = contactChildMappingTemplate;
         contactChildMapping.sourceObjectRelationship = new ObjectRelationship('Contacts','AccountId');
         contactChildMapping.targetObjectRelationship = new ObjectRelationship('Test','TestId');
-        contactChildMapping.filterString = 'Phone != null';
 
         //setting up the stubs
         Stub objectTemplateConverterStub = new Stub(ObjectMappingTemplateConverter.class);
-        Stub objectMappingLayoutServiceStub = new Stub(ObjectMappingLayoutService.class);
 
         //Mocking the ObjectMappingTemplateConverter
         ObjectMappingLayoutConverterServiceImpl objectMappingLayoutConverterService =
-                new ObjectMappingLayoutConverterServiceImpl((ObjectMappingTemplateConverter) objectTemplateConverterStub.instance,
-                        (ObjectMappingLayoutService) objectMappingLayoutServiceStub.instance);
+                new ObjectMappingLayoutConverterServiceImpl((ObjectMappingTemplateConverter) objectTemplateConverterStub.instance);
         //When
         List<ObjectMappingLayoutConverterServiceImpl.RelatedObject> relatedSourceObjects = objectMappingLayoutConverterService
                                                                         .getRelatedSourceRecords(account.Id,new List<ObjectMapping>{contactChildMapping});

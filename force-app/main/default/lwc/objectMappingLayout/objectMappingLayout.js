@@ -1,5 +1,3 @@
-
-
 import {api, LightningElement, track, wire} from 'lwc';
 import getChildObjectApiNamesByParentObjectApiName from '@salesforce/apex/ObjectUtilController.getChildObjectApiNamesByParentObjectApiName';
 import {reduceErrors, showErrorMessage, showSuccessMessage} from 'c/errorHandlingUtils';

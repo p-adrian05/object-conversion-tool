@@ -2,6 +2,9 @@
 <LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
     <apiVersion>56.0</apiVersion>
     <description>Object Filter</description>
-    <isExposed>false</isExposed>
+    <isExposed>true</isExposed>
     <masterLabel>Object Filter</masterLabel>
+    <targets>
+        <target>lightning__AppPage</target>
+    </targets>
 </LightningComponentBundle>

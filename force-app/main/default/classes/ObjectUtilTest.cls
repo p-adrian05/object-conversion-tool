@@ -1,5 +1,3 @@
-
-
 @IsTest
 private class ObjectUtilTest {
 

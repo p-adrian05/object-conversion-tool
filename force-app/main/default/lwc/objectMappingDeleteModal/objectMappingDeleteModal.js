@@ -1,4 +1,3 @@
-
 import LightningModal from "lightning/modal";
 import {api} from "lwc";
 

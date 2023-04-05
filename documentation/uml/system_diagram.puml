@@ -139,6 +139,7 @@ package "ObjectMappingTemplateModule"{
             List<ObjectMapping> childMappings
             + Object_Mapping_Layout__c toSObject()
             + {static} ObjectMappingLayout ofSObject(Object_Mapping_Layout__c objectMappingLayoutSObject)
+            + {static} ObjectMappingLayout ofSObject(Object_Mapping_Layout__c objectMappingLayoutSObject, List<Object_Mapping__c> objectMappings)
             + {static} List<ObjectMappingLayout> ofSObjects(List<Object_Mapping_Layout__c> objectMappingLayoutSObjects)
         }
         class ObjectMapping {
@@ -148,17 +149,20 @@ package "ObjectMappingTemplateModule"{
             ObjectMappingTemplate template
             ObjectRelationship sourceObjectRelationship
             ObjectRelationship targetObjectRelationship
-            String filterString
 
             + Object_Mapping__c toSObject(Id layoutId)
             + {static} ObjectMapping ofSObject(Object_Mapping__c objectMappingSObject)
             + {static} List<ObjectMapping> ofSObjects(List<Object_Mapping__c> objectMappingSObjects)
+
          }
          class FilterState {
             List<ObjectFilter> filterList
             String filterString
             String logicalCondition
-            String customLogicalCondition
+            String logicalOrder
+            String filterStringWithBinds
+            + Map<String,Object> getBindVariables()
+            - {static} Object typeCastValue(String fieldDataType, String value)
           }
           class ObjectRelationship {
                String relationshipName
@@ -177,11 +181,9 @@ package "ObjectMappingTemplateModule"{
     }
     class ObjectMappingLayoutConverterServiceImpl{
         - ObjectMappingTemplateConverter objectMappingTemplateConverter
-        - ObjectMappingLayoutService objectMappingLayoutService
 
-         + ObjectMappingLayoutConverterServiceImpl(ObjectMappingTemplateConverter objectMappingTemplateConverter
-                                                        ObjectMappingLayoutService objectMappingLayoutService)
-        + ObjectConversionResult convertObject(Id sourceRecordId,Id objectMappingLayoutId)
+         + ObjectMappingLayoutConverterServiceImpl(ObjectMappingTemplateConverter objectMappingTemplateConverter)
+        + ObjectConversionResult convertObject(Id sourceRecordId,Id objectMappingLayoutId,ObjectMappingLayoutService objectMappingLayoutService)
         + ObjectConversionResult convertObject(Id sourceRecordId,ObjectMappingLayout objectMappingLayout)
         - SObject convertParentRecord(Id parentRecordId,ObjectMapping parentObjectMapping)
         - List<SObject> convertRelatedRecords(Id sourceParentRecordId,Id targetParentRecordId,
@@ -196,21 +198,27 @@ package "ObjectMappingTemplateModule"{
    class ObjectMappingLayoutController {
         - {static} ObjectMappingLayoutService OBJECT_MAPPING_LAYOUT_SERVICE
         - {static} ObjectMappingLayoutUpsertService OBJECT_MAPPING_LAYOUT_UPSERT_SERVICE
-        - {static} ObjectMappingLayoutConverterService OBJECT_MAPPING_LAYOUT_CONVERTER_SERVICE
+
          + {static} List<ObjectMappingLayout> getMappingLayouts()
          + {static} ObjectMappingLayout getMappingLayout(Id recordId)
          + {static} UpsertLayoutResponse upsertMappingLayout(String objectMappingLayoutJSON)
          + {static} String deleteMappingLayout(Id layoutId)
          + {static} List<ObjectMappingLayout> getObjectMappingLayoutsBySourceRecordId(Id sourceRecordId)
          + {static} String markDefaultLayout(Id objectMappingLayoutId)
-         + {static} Id convertObject(Id sourceRecordId, Id objectMappingLayoutId)
         }
+
+     class ObjectMappingConverterController {
+        - {static} ObjectMappingTemplateConverter OBJECT_MAPPING_TEMPLATE_CONVERTER
+        - {static} ObjectMappingLayoutService OBJECT_MAPPING_LAYOUT_SERVICE
+        - {static} ObjectMappingLayoutConverterService OBJECT_MAPPING_LAYOUT_CONVERTER_SERVICE
+        + {static} String convertObjectFromLayout(Id sourceRecordId, Id objectMappingLayoutId)
+      }
      ObjectMappingLayoutConverterServiceImpl -u|> ObjectMappingLayoutConverterService
      ObjectMappingLayoutConverterServiceImpl -u-> ObjectMappingLayoutService
 
      ObjectMappingLayoutController --> ObjectMappingLayoutService
      ObjectMappingLayoutController --> ObjectMappingLayoutUpsertService
-     ObjectMappingLayoutController --> ObjectMappingLayoutConverterService
+     ObjectMappingConverterController --> ObjectMappingLayoutConverterService
 
 
  }

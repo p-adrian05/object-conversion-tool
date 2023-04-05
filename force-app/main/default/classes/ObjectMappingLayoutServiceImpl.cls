@@ -1,4 +1,3 @@
-
 public with sharing class ObjectMappingLayoutServiceImpl implements ObjectMappingLayoutService{
 
     /**
@@ -25,12 +24,15 @@ public with sharing class ObjectMappingLayoutServiceImpl implements ObjectMappin
                                                             Object_Mapping_Template__r.Target_Object_Api_Name__c
                                                     FROM Object_Mappings__r ) FROM Object_Mapping_Layout__c
                                                     WHERE Id=:objectMappingLayoutId];
-
-         return createObjectMappingLayoutWithObjectMappings(objectMappingLayouts.size()==1?objectMappingLayouts.get(0):null);
+        Object_Mapping_Layout__c objectMappingLayoutSObject = objectMappingLayouts.size()==1?objectMappingLayouts.get(0):null;
+        if(objectMappingLayoutSObject==null){
+            return null;
+        }
+        return ObjectMappingLayout.ofSObject(objectMappingLayoutSObject,objectMappingLayoutSObject.Object_Mappings__r);
     }
     /**
     * Retrieves an Object_Mapping_Layout__c represented as ObjectMappingLayout object by its Id with Id field and IsDefault fields
-    * with related ObjectMappings (Object_Mapping__c) object with fields Id,Filter_Condition__c,
+    * with related ObjectMappings (Object_Mapping__c) object with fields Id,Filter_State_JSON__c
      *      Target_Object_Relationship_JSON__c,Source_Object_Relationship_JSON__c,
     * and with related ObjectMappingTemplate (Object_Mapping_Template__c) object with fields Id, Source_Object_Api_Name__c,
      * Target_Object_Api_Name__c and Mapping_Data__c.
@@ -43,7 +45,7 @@ public with sharing class ObjectMappingLayoutServiceImpl implements ObjectMappin
         ObjectUtil.requireNonNull(objectMappingLayoutId, 'objectMappingLayoutId cannot be null to retrieve ObjectMappingLayout for conversion.');
         List<Object_Mapping_Layout__c> objectMappingLayouts = [SELECT Id, IsDefault__c, Parent_Object_Mapping__c,
                                                             (SELECT Id,
-                                                                    Filter_Condition__c,
+                                                                    Filter_State_JSON__c,
                                                                     Object_Mapping_Template__c,
                                                                     Target_Object_Relationship_JSON__c,
                                                                     Source_Object_Relationship_JSON__c,
@@ -53,41 +55,11 @@ public with sharing class ObjectMappingLayoutServiceImpl implements ObjectMappin
                                                             FROM Object_Mappings__r) FROM Object_Mapping_Layout__c
                                                             WHERE Id=:objectMappingLayoutId];
 
-        return createObjectMappingLayoutWithObjectMappings(objectMappingLayouts.size()==1?objectMappingLayouts.get(0):null);
-    }
-    /**
-        Creates an ObjectMappingLayout object using the given Object_Mapping_Layout__c SObject.
-
-        @param objectMappingLayoutSObject the Object_Mapping_Layout__c SObject to create the ObjectMappingLayout object from
-        @return the ObjectMappingLayout object created from the Object_Mapping_Layout__c SObject or null if the given SObject is null
-   */
-    private ObjectMappingLayout createObjectMappingLayoutWithObjectMappings(Object_Mapping_Layout__c objectMappingLayoutSObject){
+        Object_Mapping_Layout__c objectMappingLayoutSObject = objectMappingLayouts.size()==1?objectMappingLayouts.get(0):null;
         if(objectMappingLayoutSObject==null){
             return null;
         }
-        List<Object_Mapping__c> childObjectMappingSObjects = new List<Object_Mapping__c>();
-        Object_Mapping__c parentObjectMappingSObject;
-
-        // collect child and parent Object_Mapping__c records
-        for(Object_Mapping__c objectMappingSObject:objectMappingLayoutSObject.Object_Mappings__r){
-            if(objectMappingSObject.Id == objectMappingLayoutSObject.Parent_Object_Mapping__c){
-                parentObjectMappingSObject = objectMappingSObject;
-            }else{
-                childObjectMappingSObjects.add(objectMappingSObject);
-            }
-        }
-        // create ObjectMappingLayout object
-        ObjectMappingLayout objectMappingLayout = ObjectMappingLayout.ofSObject(objectMappingLayoutSObject);
-
-        if(parentObjectMappingSObject!=null){
-            //create ObjectMapping objects
-            ObjectMapping parentObjectMapping = ObjectMapping.ofSObject(parentObjectMappingSObject);
-            List<ObjectMapping> childObjectMappings = ObjectMapping.ofSObjects(childObjectMappingSObjects);
-            // set ObjectMapping objects on ObjectMappingLayout object
-            objectMappingLayout.parentMapping = parentObjectMapping;
-            objectMappingLayout.childMappings = childObjectMappings;
-        }
-        return objectMappingLayout;
+        return ObjectMappingLayout.ofSObject(objectMappingLayoutSObject,objectMappingLayoutSObject.Object_Mappings__r);
     }
     /**
     * Returns all Object_Mapping_Layout__c represented as ObjectMappingLayout instances with Id, Name ,IsDefault and

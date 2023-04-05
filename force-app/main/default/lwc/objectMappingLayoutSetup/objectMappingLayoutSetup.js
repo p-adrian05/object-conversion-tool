@@ -1,4 +1,3 @@
-
 import {api, LightningElement, track, wire} from 'lwc';
 import getMappingLayouts from '@salesforce/apex/ObjectMappingLayoutController.getMappingLayouts';
 import upsertMappingLayout from '@salesforce/apex/ObjectMappingLayoutController.upsertMappingLayout';

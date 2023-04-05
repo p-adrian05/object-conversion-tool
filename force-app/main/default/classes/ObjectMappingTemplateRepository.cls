@@ -1,5 +1,3 @@
-
-
 public interface ObjectMappingTemplateRepository {
     /**
        Returns a single Object_Mapping_Template__c record that matches the specified recordId

@@ -44,7 +44,6 @@ public with sharing class ObjectMappingLayoutUpsertServiceTest {
                         SELECT Id,
                                 Object_Mapping_Template__c,
                                 Source_Object_Relationship_JSON__c,
-                                Filter_Condition__c,
                                 Filter_State_JSON__c,
                                 Target_Object_Relationship_JSON__c
                         FROM Object_Mappings__r
@@ -63,7 +62,6 @@ public with sharing class ObjectMappingLayoutUpsertServiceTest {
 
             Assert.areEqual(expectedObjectMapping.sourceObjectRelationship, JSON.deserialize(actualObjectMapping.Source_Object_Relationship_JSON__c, ObjectRelationship.class));
             Assert.areEqual(expectedObjectMapping.targetObjectRelationship, JSON.deserialize(actualObjectMapping.Target_Object_Relationship_JSON__c, ObjectRelationship.class));
-            Assert.areEqual(expectedObjectMapping.filterString, actualObjectMapping.Filter_Condition__c);
             Assert.areEqual(expectedObjectMapping.filterState, JSON.deserialize(actualObjectMapping.Filter_State_JSON__c, FilterState.class));
         }
     }

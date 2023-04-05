@@ -1,5 +1,3 @@
-
-
 public with sharing class ObjectFilter {
     @AuraEnabled
     public String id;
@@ -11,5 +9,7 @@ public with sharing class ObjectFilter {
     public String operator;
     @AuraEnabled
     public String operatorValue;
+    @AuraEnabled
+    public String bindVariable;
 
 }

@@ -75,13 +75,13 @@ export default class ObjectMappingTable extends LightningElement {
     }
     handleMappingTemplateNameInputChange(event){
         if (event.detail.value.trim().length === 0) {
-            this.resetTemplate();
+            this.resetMappingTemplate();
         } else {
             this.selectedMappingTemplateName = event.detail.value;
         }
     }
 
-    @api resetTemplate(){
+    @api resetMappingTemplate(){
         this.selectedMappingTemplateName = undefined;
         this.selectedMappingTemplateOption = undefined;
         this.selectedMappingTemplateId = undefined;
@@ -105,7 +105,7 @@ export default class ObjectMappingTable extends LightningElement {
        }
     }
     handleResetButtonClick(event){
-        this.resetTemplate();
+        this.resetMappingTemplate();
     }
     handleRestoreButtonClick(event){
         this.template.querySelector('c-object-mapping-form').restoreFieldMappings();
@@ -128,7 +128,7 @@ export default class ObjectMappingTable extends LightningElement {
             this.handleLoading();
             deleteMappingTemplate({mappingTemplateId: this.selectedMappingTemplateId})
                 .then(result=>{
-                    this.resetTemplate();
+                    this.resetMappingTemplate();
                     this.notifySelectedTemplateRecordChange();
 
                     showSuccessMessage(result);

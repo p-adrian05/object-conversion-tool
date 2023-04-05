@@ -1,5 +1,3 @@
-
-
 public interface ObjectMappingLayoutUpsertService {
     /**
     * Upserts the specified Object_Mapping_Layout__c record represented in ObjectMappingLayout

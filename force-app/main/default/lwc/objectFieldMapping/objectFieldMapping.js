@@ -1,5 +1,3 @@
-
-
 import {api, LightningElement, track} from 'lwc';
 
 export default class ObjectFieldMapping extends LightningElement {

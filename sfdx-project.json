@@ -3,8 +3,8 @@
     {
       "path": "force-app",
       "package": "Object Conversion Tool",
-      "versionName": "ver 1.0",
-      "versionNumber": "1.0.0.NEXT",
+      "versionName": "ver 1.1",
+      "versionNumber": "1.1.0.NEXT",
       "default": true,
       "versionDescription": ""
     }
@@ -12,9 +12,11 @@
   "name": "Object Conversion Tool",
   "namespace": "",
   "sfdcLoginUrl": "https://login.salesforce.com",
-  "sourceApiVersion": "55.0",
+  "sourceApiVersion": "57.0",
   "packageAliases": {
     "Object Conversion Tool": "0Ho680000004CCCCA2",
-    "Object Conversion Tool@1.0.0-1": "04t68000000gXHrAAM"
+    "Object Conversion Tool@1.0.0-1": "04t68000000gXHrAAM",
+    "Object Conversion Tool@1.0.0-2": "04t68000000t30LAAQ",
+    "Object Conversion Tool@1.1.0-1": "04t68000000t30QAAQ"
   }
 }

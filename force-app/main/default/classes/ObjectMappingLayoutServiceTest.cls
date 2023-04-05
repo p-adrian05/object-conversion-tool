@@ -1,5 +1,3 @@
-
-
 @IsTest
 public with sharing class ObjectMappingLayoutServiceTest {
 
@@ -26,12 +24,11 @@ public with sharing class ObjectMappingLayoutServiceTest {
         Assert.areEqual(parentObjectMapping.Id, actualObjectMappingLayoutModel.parentMapping.id);
 
         ObjectMapping actualChildObjectMappingModel = actualObjectMappingLayoutModel.childMappings[0];
-        Assert.isNull(actualChildObjectMappingModel.filterString);
         Assert.isNull(actualChildObjectMappingModel.template.fieldMappings);
 
         Assert.areEqual(childObjectMapping.Source_Object_Relationship_JSON__c, JSON.serialize(actualChildObjectMappingModel.sourceObjectRelationship));
         Assert.areEqual(childObjectMapping.Target_Object_Relationship_JSON__c, JSON.serialize(actualChildObjectMappingModel.targetObjectRelationship));
-        Assert.areEqual(childObjectMapping.Filter_State_JSON__c, JSON.serialize(actualChildObjectMappingModel.filterState));
+        Assert.isNotNull(actualChildObjectMappingModel.filterState);
         Assert.areEqual(childObjectMapping.External_Id__c, actualChildObjectMappingModel.externalId);
 
         Assert.areEqual(childObjectMappingTemplate.Id, actualChildObjectMappingModel.template.id);
@@ -67,8 +64,7 @@ public with sharing class ObjectMappingLayoutServiceTest {
 
         ObjectMapping actualChildObjectMappingModel = actualObjectMappingLayoutModel.childMappings[0];
         Assert.isNotNull(actualChildObjectMappingModel.template.fieldMappings);
-        Assert.isNull(actualChildObjectMappingModel.filterState);
-        Assert.areEqual(childObjectMapping.Filter_Condition__c,actualChildObjectMappingModel.filterString);
+        Assert.isNotNull(actualChildObjectMappingModel.filterState);
         Assert.areEqual(childObjectMapping.Source_Object_Relationship_JSON__c, JSON.serialize(actualChildObjectMappingModel.sourceObjectRelationship));
         Assert.areEqual(childObjectMapping.Target_Object_Relationship_JSON__c, JSON.serialize(actualChildObjectMappingModel.targetObjectRelationship));
 

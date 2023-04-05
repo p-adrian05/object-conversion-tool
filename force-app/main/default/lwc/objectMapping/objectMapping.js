@@ -1,4 +1,3 @@
-
 import {api, LightningElement, track} from 'lwc';
 
 export default class ObjectMapping extends LightningElement {
@@ -71,7 +70,7 @@ export default class ObjectMapping extends LightningElement {
         this.templateSelectDisable = false;
         this.selectedTemplate = undefined;
 
-        this.template.querySelector('c-object-mapping-table').resetTemplate();
+        this.template.querySelector('c-object-mapping-table').resetMappingTemplate();
     }
 
     handleAddFilterButton(event){

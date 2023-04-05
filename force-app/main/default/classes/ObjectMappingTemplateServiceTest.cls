@@ -1,5 +1,3 @@
-
-
 @IsTest
 public class ObjectMappingTemplateServiceTest {
     @IsTest
