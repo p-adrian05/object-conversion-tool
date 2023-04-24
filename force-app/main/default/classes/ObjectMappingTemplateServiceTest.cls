@@ -1,5 +1,7 @@
 @IsTest
 public class ObjectMappingTemplateServiceTest {
+
+
     @IsTest
     static void testUpsertObjectMappingTemplate() {
         // Given
@@ -14,9 +16,7 @@ public class ObjectMappingTemplateServiceTest {
         FieldMapping contactPhoneToAccountPhoneMapping = new FieldMapping('3',contactPhoneFromField,accountPhoneToField);
         objectMappingTemplate.fieldMappings = new List<FieldMapping>{contactPhoneToAccountPhoneMapping};
 
-        Stub repositoryStub = new Stub(ObjectMappingTemplateRepositoryImpl.class);
-        ObjectMappingTemplateService objectMappingTemplateService =
-                new ObjectMappingTemplateServiceImpl((ObjectMappingTemplateRepository) repositoryStub.instance);
+        ObjectMappingTemplateService objectMappingTemplateService = new ObjectMappingTemplateServiceImpl();
 
         // When
         Id actualTemplateId = objectMappingTemplateService.upsertObjectMappingTemplate(objectMappingTemplate);
@@ -24,8 +24,8 @@ public class ObjectMappingTemplateServiceTest {
         // Then
         Assert.isNotNull(actualTemplateId);
 
-        Object_Mapping_Template__c mappingTemplateSObject = [SELECT Id, Name, Source_Object_Api_Name__c,
-                                                            Target_Object_Api_Name__c, Description__c, Mapping_Data__c
+        Object_Mapping_Template__c mappingTemplateSObject = [SELECT Id, Name, Source_Object_Api_Name__c, Description__c,
+                                                            Target_Object_Api_Name__c, Mapping_Data__c
                                                             FROM Object_Mapping_Template__c WHERE Id = :actualTemplateId LIMIT 1];
 
         Assert.areEqual(objectMappingTemplate.name, mappingTemplateSObject.Name);
@@ -36,54 +36,6 @@ public class ObjectMappingTemplateServiceTest {
 
     }
 
-    @IsTest
-    static void testGetObjectMappingTemplate() {
-        // Given
-        String templateName = 'Test name';
-        String sourceObjectApiName = 'Account';
-        String targetObjectApiName = 'Contact';
-        Object_Mapping_Template__c objectMappingTemplateSobject =
-                ObjectMappingTemplateDataFactory.createObjectMappingTemplate(templateName, sourceObjectApiName, targetObjectApiName, true);
-
-        Stub repositoryStub = new Stub(ObjectMappingTemplateRepositoryImpl.class);
-        ObjectMappingTemplateService objectMappingTemplateService =
-                new ObjectMappingTemplateServiceImpl((ObjectMappingTemplateRepository) repositoryStub.instance);
-        repositoryStub.setReturnValue('getObjectMappingTemplateRecord', objectMappingTemplateSobject);
-
-        // When
-        ObjectMappingTemplate actualObjectMappingTemplate = objectMappingTemplateService.getObjectMappingTemplate(objectMappingTemplateSobject.Id);
-
-        // Then
-        Assert.areEqual(templateName, actualObjectMappingTemplate.name);
-        Assert.areEqual(sourceObjectApiName, actualObjectMappingTemplate.sourceObjectApiName);
-        Assert.areEqual(targetObjectApiName, actualObjectMappingTemplate.targetObjectApiName);
-        Assert.areEqual(objectMappingTemplateSobject.Mapping_Data__c, JSON.serialize(actualObjectMappingTemplate.fieldMappings));
-    }
-
-    @IsTest
-    static void testGetObjectMappingTemplates() {
-        // Given
-        List<String> sourceObjectApiNames = new List<String>{'Account','Contact'};
-        List<String> targetObjectApiNames = new List<String>{'Contact','Account'};
-        List<Object_Mapping_Template__c> objectMappingTemplateSobjects =
-                ObjectMappingTemplateDataFactory.createObjectMappingTemplates(sourceObjectApiNames, targetObjectApiNames);
-
-        Stub repositoryStub = new Stub(ObjectMappingTemplateRepositoryImpl.class);
-        ObjectMappingTemplateService objectMappingTemplateService =
-                new ObjectMappingTemplateServiceImpl((ObjectMappingTemplateRepository) repositoryStub.instance);
-        repositoryStub.setReturnValue('getMappingTemplates', objectMappingTemplateSobjects);
-
-        // When
-        List<ObjectMappingTemplate> actualObjectMappingTemplates = objectMappingTemplateService.getObjectMappingTemplates(sourceObjectApiNames, targetObjectApiNames);
-
-        // Then
-        Assert.areEqual(objectMappingTemplateSobjects.size(), actualObjectMappingTemplates.size());
-        for(Integer i = 0; i < objectMappingTemplateSobjects.size(); i++) {
-            Assert.areEqual(objectMappingTemplateSobjects.get(i).Name, actualObjectMappingTemplates.get(i).name);
-            Assert.isTrue(sourceObjectApiNames.contains(actualObjectMappingTemplates.get(i).sourceObjectApiName));
-            Assert.isTrue(targetObjectApiNames.contains(actualObjectMappingTemplates.get(i).targetObjectApiName));
-        }
-    }
 
     @IsTest
     static void testDeleteObjectMappingTemplateWithNoRelationToAnyObjectMappingLayout() {
@@ -91,10 +43,7 @@ public class ObjectMappingTemplateServiceTest {
         Object_Mapping_Template__c objectMappingTemplateSobject =
                 ObjectMappingTemplateDataFactory.createObjectMappingTemplate( true);
 
-        Stub repositoryStub = new Stub(ObjectMappingTemplateRepositoryImpl.class);
-        ObjectMappingTemplateService objectMappingTemplateService =
-                new ObjectMappingTemplateServiceImpl((ObjectMappingTemplateRepository) repositoryStub.instance);
-        repositoryStub.setReturnValue('getRelatedObjectMappingsWithLayoutName', new List<Object_Mapping__c>{});
+        ObjectMappingTemplateService objectMappingTemplateService = new ObjectMappingTemplateServiceImpl();
 
         // When
         Test.startTest();
@@ -119,10 +68,7 @@ public class ObjectMappingTemplateServiceTest {
         objectMappingSobject.Object_Mapping_Layout__c = objectMappingLayoutSobject.Id;
         insert objectMappingSobject;
 
-        Stub repositoryStub = new Stub(ObjectMappingTemplateRepositoryImpl.class);
-        ObjectMappingTemplateService objectMappingTemplateService =
-                new ObjectMappingTemplateServiceImpl((ObjectMappingTemplateRepository) repositoryStub.instance);
-        repositoryStub.setReturnValue('getRelatedObjectMappingsWithLayoutName', new List<Object_Mapping__c>{objectMappingSobject});
+        ObjectMappingTemplateService objectMappingTemplateService = new ObjectMappingTemplateServiceImpl();
 
         String exceptionMessage;
         // When
@@ -139,4 +85,5 @@ public class ObjectMappingTemplateServiceTest {
         Assert.isNotNull(exceptionMessage);
         Assert.areEqual(objectMappingTemplateSobject.Id,[SELECT Id FROM Object_Mapping_Template__c WHERE Id = :objectMappingTemplateSobject.Id LIMIT 1].Id);
     }
+
 }

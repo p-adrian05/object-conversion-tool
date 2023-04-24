@@ -1,96 +1,135 @@
 public with sharing class ObjectMappingLayoutServiceImpl implements ObjectMappingLayoutService{
 
+
     /**
-     * Retrieves an Object_Mapping_Layout__c represented as ObjectMappingLayout object by its Id with Id, IsDefault and  Name fields
-     * and with related ObjectMappings (Object_Mapping__c) objects with fields Id,External_Id__c,Filter_State_JSON__c,
-     *      Target_Object_Relationship_JSON__c,Source_Object_Relationship_JSON__c,
-     * and with related ObjectMappingTemplate (Object_Mapping_Template__c) objects with fields Id, Source_Object_Api_Name__c
-     * and Target_Object_Api_Name__c
+    * Upserts the specified Object_Mapping_Layout__c record represented in ObjectMappingLayout
+            * object with its associated Object_Mapping__c records.
+
+            * @param objectMappingLayout - ObjectMappingLayout object to be upserted
+            * @return Id - Id of the upserted ObjectMappingLayout object
+            * @throws SObjectException - Throws exception if there is any issue with upserting ObjectMappingLayout record
+            or its associated child or parent ObjectMappings
+            */
+    public Id upsertObjectMappingLayout(ObjectMappingLayout objectMappingLayout){
+        ObjectUtil.requireNonNull(objectMappingLayout, 'ObjectMappingLayout cannot be null to upsert Object_Mapping_Layout__c record.');
+        Object_Mapping_Layout__c objectMappingLayoutSObject = objectMappingLayout.toSObject();
+
+        if(!Object_Mapping_Layout__c.getSObjectType().getDescribe().isCreateable()){
+            throw new SObjectException('Do not have permission to create Object_Mapping_Layout__c object.');
+        }
+        if(!Object_Mapping_Layout__c.getSObjectType().getDescribe().isUpdateable()){
+            throw new SObjectException('Do not have permission to update Object_Mapping_Layout__c object.');
+        }
+
+        //get the original associated Object_Mapping__c records before upserting
+        // the Object_Mapping_Layout__c record with new Object_Mapping__c records
+        List<Id> oldObjectMappingIds = new List<Id>();
+        if(objectMappingLayoutSObject.Id != null){
+            oldObjectMappingIds = getObjectMappingIds(objectMappingLayoutSObject.Id);
+        }
+
+        Savepoint savepoint = Database.setSavepoint();
+        try{
+            upsert objectMappingLayoutSObject;
+
+            //upsert new child and parent Object_Mapping__c records
+            List<Object_Mapping__c> childMappings =
+                    upsertObjectMappings(objectMappingLayout.childMappings,objectMappingLayoutSObject.Id);
+            List<Object_Mapping__c> parentMapping =
+                    upsertObjectMappings(new List<ObjectMapping>{objectMappingLayout.parentMapping},objectMappingLayoutSObject.Id);
+
+            if(parentMapping.size()==1){
+                objectMappingLayoutSObject.Parent_Object_Mapping__c = parentMapping.get(0).Id;
+                update objectMappingLayoutSObject;
+            }
+
+            //delete unlinked Object_Mapping__c records comparing old and new Object_Mapping__c records
+            List<Object_Mapping__c> newObjectMappingSObjects = new List<Object_Mapping__c>();
+            newObjectMappingSObjects.addAll(childMappings);
+            newObjectMappingSObjects.addAll(parentMapping);
+            removeUnlinkedObjectMappings(oldObjectMappingIds,newObjectMappingSObjects);
+
+        }catch (Exception e){
+            Database.rollback(savepoint);
+            System.debug(e.getMessage());
+            throw e;
+        }
+
+        return objectMappingLayoutSObject.Id;
+    }
+    /**
+        This method removes unlinked Object_Mapping__c records by comparing a list of old and new Object_Mapping__c Ids.
+
+        If an Object_Mapping__c Id from the old list is not in the new list, a new Object_Mapping__c  is created
+        with the Id of the old mapping and added to a list of Object_Mapping__c records to delete.
+        The list is then deleted if it contains any elements.
+
+        @param oldObjectMappingIds List of Ids of old Object Mapping records
+        @param newObjectMappingSObjects List of new Object Mapping records
+        @return List of Object Mapping records to be deleted
+     */
+    @TestVisible
+    private List<Object_Mapping__c> removeUnlinkedObjectMappings(List<Id> oldObjectMappingIds,List<Object_Mapping__c> newObjectMappingSObjects){
+        List<Object_Mapping__c> objectMappingsToDelete = new List<Object_Mapping__c>();
+
+        //get the Ids of the new Object_Mapping__c records
+        Set<Id> newObjectMappingIds = new Set<Id>();
+        for(Object_Mapping__c newObjectMapping:newObjectMappingSObjects){
+            newObjectMappingIds.add(newObjectMapping.Id);
+        }
+        //compare the old and new Object_Mapping__c record ids
+        for(Id oldMappingId : oldObjectMappingIds){
+            if(!newObjectMappingIds.contains(oldMappingId)){
+                objectMappingsToDelete.add(new Object_Mapping__c(Id=oldMappingId));
+            }
+        }
+        //delete the unlinked Object_Mapping__c records
+        if(!objectMappingsToDelete.isEmpty()){
+            delete objectMappingsToDelete;
+        }
+        return objectMappingsToDelete;
+    }
+    /**
+     * This method returns a list of `Id`s of `Object_Mapping__c` records
+     * that are associated with the provided `Object_Mapping_Layout__c` record.
      *
-     * @param objectMappingLayoutId The Id of the Object_Mapping_Layout__c to retrieve.
-     * @return An ObjectMappingLayout object representing the retrieved Object_Mapping_Layout__c record,
-     * along with any associated Object_Mapping__c records if no Object_Mapping_Layout__c record is found, null is returned.
-    */
-    public ObjectMappingLayout getObjectMappingLayoutForDisplay(Id objectMappingLayoutId){
-        ObjectUtil.requireNonNull(objectMappingLayoutId, 'objectMappingLayoutId cannot be null to retrieve ObjectMappingLayout for display.');
-        List<Object_Mapping_Layout__c> objectMappingLayouts = [SELECT Id,Name,IsDefault__c,Parent_Object_Mapping__c,
-                                                    (SELECT Id,
-                                                            External_Id__c,
-                                                            Filter_State_JSON__c,
-                                                            Target_Object_Relationship_JSON__c,
-                                                            Source_Object_Relationship_JSON__c,
-                                                            Object_Mapping_Template__c,
-                                                            Object_Mapping_Template__r.Source_Object_Api_Name__c,
-                                                            Object_Mapping_Template__r.Target_Object_Api_Name__c
-                                                    FROM Object_Mappings__r ) FROM Object_Mapping_Layout__c
-                                                    WHERE Id=:objectMappingLayoutId];
-        Object_Mapping_Layout__c objectMappingLayoutSObject = objectMappingLayouts.size()==1?objectMappingLayouts.get(0):null;
-        if(objectMappingLayoutSObject==null){
-            return null;
+     * @param mappingLayoutId The `Id` of the `Object_Mapping_Layout__c` record
+     * to get the associated `Object_Mapping__c` records for.
+     *
+     * @return A list of `Id`s of `Object_Mapping__c` records
+     * that are associated with the provided `Object_Mapping_Layout__c` record.
+ */
+    private List<Id> getObjectMappingIds(Id mappingLayoutId){
+        List<Id> mappingIds = new List<Id>();
+
+        for(Object_Mapping__c objectMapping:[SELECT Id FROM Object_Mapping__c WHERE Object_Mapping_Layout__c =:mappingLayoutId]){
+            mappingIds.add(objectMapping.Id);
         }
-        return ObjectMappingLayout.ofSObject(objectMappingLayoutSObject,objectMappingLayoutSObject.Object_Mappings__r);
+        return mappingIds;
     }
     /**
-    * Retrieves an Object_Mapping_Layout__c represented as ObjectMappingLayout object by its Id with Id field and IsDefault fields
-    * with related ObjectMappings (Object_Mapping__c) object with fields Id,Filter_State_JSON__c
-     *      Target_Object_Relationship_JSON__c,Source_Object_Relationship_JSON__c,
-    * and with related ObjectMappingTemplate (Object_Mapping_Template__c) object with fields Id, Source_Object_Api_Name__c,
-     * Target_Object_Api_Name__c and Mapping_Data__c.
-    *
-    * @param objectMappingLayoutId The Id of the Object_Mapping_Layout__c to retrieve.
-    * @return An ObjectMappingLayout object representing the retrieved Object_Mapping_Layout__c record,
-    * along with any associated Object_Mapping__c records if no Object_Mapping_Layout__c record is found, null is returned.
-   */
-    public ObjectMappingLayout getObjectMappingLayoutForConversion(Id objectMappingLayoutId){
-        ObjectUtil.requireNonNull(objectMappingLayoutId, 'objectMappingLayoutId cannot be null to retrieve ObjectMappingLayout for conversion.');
-        List<Object_Mapping_Layout__c> objectMappingLayouts = [SELECT Id, IsDefault__c, Parent_Object_Mapping__c,
-                                                            (SELECT Id,
-                                                                    Filter_State_JSON__c,
-                                                                    Object_Mapping_Template__c,
-                                                                    Target_Object_Relationship_JSON__c,
-                                                                    Source_Object_Relationship_JSON__c,
-                                                                    Object_Mapping_Template__r.Source_Object_Api_Name__c,
-                                                                    Object_Mapping_Template__r.Target_Object_Api_Name__c,
-                                                                    Object_Mapping_Template__r.Mapping_Data__c
-                                                            FROM Object_Mappings__r) FROM Object_Mapping_Layout__c
-                                                            WHERE Id=:objectMappingLayoutId];
+        Upserts a list of Object_Mapping__c records that are represented in ObjectMapping objects.
 
-        Object_Mapping_Layout__c objectMappingLayoutSObject = objectMappingLayouts.size()==1?objectMappingLayouts.get(0):null;
-        if(objectMappingLayoutSObject==null){
-            return null;
+        @param objectMappings A list of ObjectMapping objects to upsert.
+        @param layoutId The ID of the Object_Mapping_Layout__c record to associate with the Object_Mapping__c records.
+        @return A list of Object_Mapping__c records that were upserted.
+    */
+    private List<Object_Mapping__c> upsertObjectMappings(List<ObjectMapping> objectMappings,Id layoutId){
+        List<Object_Mapping__c> objectMappingsSObjects = new List<Object_Mapping__c>();
+
+        if(objectMappings!=null){
+            for(ObjectMapping objectMapping:objectMappings){
+                if(objectMapping!=null) {
+                    objectMappingsSObjects.add(objectMapping.toSObject(layoutId));
+                }
+            }
         }
-        return ObjectMappingLayout.ofSObject(objectMappingLayoutSObject,objectMappingLayoutSObject.Object_Mappings__r);
+        if(objectMappingsSObjects.size()>0){
+            upsert objectMappingsSObjects;
+        }
+        return objectMappingsSObjects;
     }
-    /**
-    * Returns all Object_Mapping_Layout__c represented as ObjectMappingLayout instances with Id, Name ,IsDefault and
-     * Description fields.
-    *
-    * @return A list of ObjectMappingLayout instances.
-    */
-    public List<ObjectMappingLayout> getObjectMappingLayouts(){
-        List<Object_Mapping_Layout__c> objectMappingLayoutSObjects =[SELECT Id,Name,Description__c,IsDefault__c
-                                                                    FROM Object_Mapping_Layout__c ORDER BY Name];
 
-        return ObjectMappingLayout.ofSObjects(objectMappingLayoutSObjects);
-    }
-    /**
-      * This method returns a list of Object_Mapping_Layout__c represented as ObjectMappingLayout instances
-      * with fields Id ,IsDefault, Name and Description.
-      *
-      * @param sourceObjectApiName the API name of the parent source object for which to retrieve associated Object Mapping Layout records
-      *
-      * @return A list of ObjectMappingLayout instances.
-    */
-    public List<ObjectMappingLayout> getObjectMappingLayoutsByParentSourceObject(String sourceObjectApiName){
-        ObjectUtil.requireNonNull(sourceObjectApiName, 'sourceObjectApiName cannot be null to retrieve ObjectMappingLayouts by parent source object.');
-        List<Object_Mapping_Layout__c> objectMappingLayoutSObjects =
-                                                    [SELECT Id,Name,Description__c, IsDefault__c
-                                                        FROM Object_Mapping_Layout__c
-                                                        WHERE Parent_Source_Object_Api_Name__c =:sourceObjectApiName
-                                                        ORDER BY Name];
-
-        return ObjectMappingLayout.ofSObjects(objectMappingLayoutSObjects);
-    }
     /**
     Deletes an Object_Mapping_Layout__c record by the specified ID. If the layout record has a parent Object_Mapping__c,
     the parent field is first cleared to avoid deleting a parent record while a child is still referencing it.
@@ -99,11 +138,17 @@ public with sharing class ObjectMappingLayoutServiceImpl implements ObjectMappin
     @throws SObjectException if an error occurs during the delete operation
     */
     public void deleteObjectMappingLayout(Id objectMappingLayoutId){
-        ObjectUtil.requireNonNull(objectMappingLayoutId, 'objectMappingLayoutId cannot be null to delete ObjectMappingLayout.');
+        ObjectUtil.requireNonNull(objectMappingLayoutId, 'objectMappingLayoutId cannot be null' +
+                ' to delete ObjectMappingLayout.');
 
-        List<Object_Mapping_Layout__c> layouts = [SELECT Id, Parent_Object_Mapping__c FROM
-                                                Object_Mapping_Layout__c WHERE Id = :objectMappingLayoutId];
-        if(layouts.size()>0) {
+        if(!Object_Mapping_Layout__c.SObjectType.getDescribe().isDeletable()){
+            throw new SObjectException('Do not have permission to delete Object_Mapping_Layout__c records.');
+        }
+
+        List<Object_Mapping_Layout__c> layouts = Database.query('SELECT Id, Parent_Object_Mapping__c FROM '+
+                                            ' Object_Mapping_Layout__c WHERE Id = :objectMappingLayoutId');
+
+        if(layouts.size()>0){
             Savepoint savepoint = Database.setSavepoint();
             Object_Mapping_Layout__c layout = layouts.get(0);
 
@@ -116,7 +161,7 @@ public with sharing class ObjectMappingLayoutServiceImpl implements ObjectMappin
             }catch (Exception e){
                 Database.rollback(savepoint);
                 System.debug(e.getMessage());
-                throw new SObjectException(e.getMessage());
+                throw e;
             }
         }
     }
@@ -130,16 +175,22 @@ public with sharing class ObjectMappingLayoutServiceImpl implements ObjectMappin
     public void markDefaultObjectMappingLayout(Id objectMappingLayoutId){
         ObjectUtil.requireNonNull(objectMappingLayoutId, 'objectMappingLayoutId cannot be null to mark ObjectMappingLayout as default.');
 
+        if(!Object_Mapping_Layout__c.IsDefault__c.getDescribe().isUpdateable()){
+            throw new SObjectException('Do not have permission to mark default Object_Mapping_Layout__c records.');
+        }
+
         String parentSourceObjectApiName = [SELECT Parent_Source_Object_Api_Name__c FROM Object_Mapping_Layout__c
                                         WHERE Id =:objectMappingLayoutId]?.Parent_Source_Object_Api_Name__c;
 
         if(parentSourceObjectApiName == null){
-            throw new SObjectException('Parent Source Object API Name is null to mark it default ' +
+            throw new SObjectException('Parent Source Object API Name is null or dont have access to mark it default ' +
                     'Id' + objectMappingLayoutId);
         }
         // clear all other default layouts for the parent source object
-        List<Object_Mapping_Layout__c> layouts = [SELECT Id, IsDefault__c FROM Object_Mapping_Layout__c
-                                            WHERE Parent_Source_Object_Api_Name__c =:parentSourceObjectApiName];
+        List<Object_Mapping_Layout__c> layouts = ObjectUtil.executeQueryWithoutSharing(
+                                'SELECT Id, IsDefault__c FROM Object_Mapping_Layout__c' +
+                                ' WHERE Parent_Source_Object_Api_Name__c =:parentSourceObjectApiName',
+                                new Map<String,Object>{'parentSourceObjectApiName'=>parentSourceObjectApiName});
         if(layouts.size()>0) {
             for(Object_Mapping_Layout__c layout : layouts){
                 if(layout.Id == objectMappingLayoutId) {

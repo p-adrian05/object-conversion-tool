@@ -6,15 +6,15 @@ private class ObjectMappingLayoutControllerTest {
         List<ObjectMappingLayout> objectMappingLayoutsToReturn = new List<ObjectMappingLayout>{
                 ObjectMappingLayoutDataFactory.createObjectMappingLayoutModel()};
 
-        Stub layoutServiceStub = new Stub(ObjectMappingLayoutServiceImpl.class);
-        ObjectMappingLayoutController.OBJECT_MAPPING_LAYOUT_SERVICE = (ObjectMappingLayoutServiceImpl) layoutServiceStub.instance;
+        Stub layoutSelectorStub = new Stub(ObjectMappingLayoutsSelector.class);
+        ObjectMappingLayoutController.OBJECT_MAPPING_LAYOUT_SELECTOR = (ObjectMappingLayoutsSelector) layoutSelectorStub.instance;
 
-        layoutServiceStub.setReturnValue('getObjectMappingLayouts', objectMappingLayoutsToReturn);
+        layoutSelectorStub.setReturnValue('getObjectMappingLayouts', objectMappingLayoutsToReturn);
 
         //When
         List<ObjectMappingLayout> actualLayouts = ObjectMappingLayoutController.getMappingLayouts();
         //Then
-        layoutServiceStub.assertInvoked('getObjectMappingLayouts');
+        layoutSelectorStub.assertInvoked('getObjectMappingLayouts');
         Assert.areEqual(objectMappingLayoutsToReturn.size(),actualLayouts.size());
         Assert.areEqual(objectMappingLayoutsToReturn.get(0),actualLayouts.get(0));
     }
@@ -24,15 +24,15 @@ private class ObjectMappingLayoutControllerTest {
         ObjectMappingLayout objectMappingLayoutToReturn = ObjectMappingLayoutDataFactory.createObjectMappingLayoutModel();
         objectMappingLayoutToReturn.id = ObjectMappingLayoutDataFactory.createObjectMappingLayout(objectMappingLayoutToReturn.name,true).Id;
 
-        Stub layoutServiceStub = new Stub(ObjectMappingLayoutServiceImpl.class);
-        ObjectMappingLayoutController.OBJECT_MAPPING_LAYOUT_SERVICE = (ObjectMappingLayoutServiceImpl) layoutServiceStub.instance;
+        Stub layoutSelectorStub = new Stub(ObjectMappingLayoutsSelector.class);
+        ObjectMappingLayoutController.OBJECT_MAPPING_LAYOUT_SELECTOR = (ObjectMappingLayoutsSelector) layoutSelectorStub.instance;
 
-        layoutServiceStub.setReturnValue('getObjectMappingLayoutForDisplay', objectMappingLayoutToReturn);
+        layoutSelectorStub.setReturnValue('getObjectMappingLayoutWithObjectMappings', objectMappingLayoutToReturn);
 
         //When
         ObjectMappingLayout actualLayout = ObjectMappingLayoutController.getMappingLayout(objectMappingLayoutToReturn.id);
         //Then
-        layoutServiceStub.assertInvoked('getObjectMappingLayoutForDisplay');
+        layoutSelectorStub.assertInvoked('getObjectMappingLayoutWithObjectMappings');
         Assert.areEqual(objectMappingLayoutToReturn,actualLayout);
     }
     @IsTest
@@ -40,10 +40,10 @@ private class ObjectMappingLayoutControllerTest {
         //Given
         Object_Mapping_Layout__c objectMappingLayout = ObjectMappingLayoutDataFactory.createObjectMappingLayout('test',true);
 
-        Stub layoutUpsertServiceStub = new Stub(ObjectMappingLayoutUpsertServiceImpl.class);
-        ObjectMappingLayoutController.OBJECT_MAPPING_LAYOUT_UPSERT_SERVICE = (ObjectMappingLayoutUpsertServiceImpl) layoutUpsertServiceStub.instance;
+        Stub layoutServiceStub = new Stub(ObjectMappingLayoutServiceImpl.class);
+        ObjectMappingLayoutController.OBJECT_MAPPING_LAYOUT_SERVICE = (ObjectMappingLayoutServiceImpl) layoutServiceStub.instance;
 
-        layoutUpsertServiceStub.setReturnValue('upsertObjectMappingLayout', objectMappingLayout.Id);
+        layoutServiceStub.setReturnValue('upsertObjectMappingLayout', objectMappingLayout.Id);
         String layoutJSON = '{"id":"a016800000TBHtCAAX","name":"oppToOrderLayout","description":"desc",' +
                 '"parentMapping":{"id":"a0268000003Ge5nAAC","filterState":null,' +
                 '"template":{"id":"a0068000006PzTVAA0","sourceObjectApiName":"Opportunity","targetObjectApiName":"Order"},' +
@@ -59,7 +59,7 @@ private class ObjectMappingLayoutControllerTest {
         ObjectMappingLayoutController.UpsertLayoutResponse actualUpsertLayoutResponse =
                                         ObjectMappingLayoutController.upsertMappingLayout(layoutJSON);
         //Then
-        layoutUpsertServiceStub.assertInvoked('upsertObjectMappingLayout');
+        layoutServiceStub.assertInvoked('upsertObjectMappingLayout');
         Assert.areEqual(actualUpsertLayoutResponse.layoutId,objectMappingLayout.Id);
     }
     @IsTest
@@ -85,15 +85,16 @@ private class ObjectMappingLayoutControllerTest {
         Account sourceAccount = new Account(Name = 'test');
         insert sourceAccount;
 
-        Stub layoutServiceStub = new Stub(ObjectMappingLayoutServiceImpl.class);
-        ObjectMappingLayoutController.OBJECT_MAPPING_LAYOUT_SERVICE = (ObjectMappingLayoutServiceImpl) layoutServiceStub.instance;
+        Stub layoutSelectorStub = new Stub(ObjectMappingLayoutsSelector.class);
+        ObjectMappingLayoutController.OBJECT_MAPPING_LAYOUT_SELECTOR = (ObjectMappingLayoutsSelector) layoutSelectorStub.instance;
 
-        layoutServiceStub.setReturnValue('getObjectMappingLayoutsByParentSourceObject', objectMappingLayoutsToReturn);
+
+        layoutSelectorStub.setReturnValue('getObjectMappingLayoutsByParentSourceObject', objectMappingLayoutsToReturn);
 
         //When
         List<ObjectMappingLayout> actualLayouts = ObjectMappingLayoutController.getObjectMappingLayoutsBySourceRecordId(sourceAccount.Id);
         //Then
-        layoutServiceStub.assertInvoked('getObjectMappingLayoutsByParentSourceObject');
+        layoutSelectorStub.assertInvoked('getObjectMappingLayoutsByParentSourceObject');
         Assert.areEqual(objectMappingLayoutsToReturn.size(),actualLayouts.size());
         Assert.areEqual(objectMappingLayoutsToReturn.get(0),actualLayouts.get(0));
     }

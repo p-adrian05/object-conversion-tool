@@ -2,7 +2,7 @@ public with sharing class ObjectMappingLayoutController {
     @TestVisible
     private static ObjectMappingLayoutService OBJECT_MAPPING_LAYOUT_SERVICE = new ObjectMappingLayoutServiceImpl();
     @TestVisible
-    private static ObjectMappingLayoutUpsertService OBJECT_MAPPING_LAYOUT_UPSERT_SERVICE = new ObjectMappingLayoutUpsertServiceImpl();
+    private static ObjectMappingLayoutsSelector OBJECT_MAPPING_LAYOUT_SELECTOR = new ObjectMappingLayoutsSelector();
     /**
      * @return a list of all the ObjectMappingLayout records with the following fields:
     * Example:
@@ -17,7 +17,7 @@ public with sharing class ObjectMappingLayoutController {
      */
     @AuraEnabled(Cacheable=true)
     public static List<ObjectMappingLayout> getMappingLayouts(){
-        return OBJECT_MAPPING_LAYOUT_SERVICE.getObjectMappingLayouts();
+        return OBJECT_MAPPING_LAYOUT_SELECTOR.getObjectMappingLayouts();
     }
     /**
       * Returns the ObjectMappingLayout record with the given ID.
@@ -97,7 +97,7 @@ public with sharing class ObjectMappingLayoutController {
     @AuraEnabled(Cacheable=true)
     public static ObjectMappingLayout getMappingLayout(Id recordId){
         ObjectUtil.requireNonNull(recordId, 'RecordId cannot be null to retrieve ObjectMappingLayout.');
-        ObjectMappingLayout objectMappingLayout = OBJECT_MAPPING_LAYOUT_SERVICE.getObjectMappingLayoutForDisplay(recordId);
+        ObjectMappingLayout objectMappingLayout = OBJECT_MAPPING_LAYOUT_SELECTOR.getObjectMappingLayoutWithObjectMappings(recordId, false);
         return objectMappingLayout;
     }
     /**
@@ -172,7 +172,7 @@ public with sharing class ObjectMappingLayoutController {
 
         UpsertLayoutResponse upsertTemplateResponse = new UpsertLayoutResponse();
         try{
-            Id objectMappingLayoutId = OBJECT_MAPPING_LAYOUT_UPSERT_SERVICE.upsertObjectMappingLayout(objectMappingLayout);
+            Id objectMappingLayoutId = OBJECT_MAPPING_LAYOUT_SERVICE.upsertObjectMappingLayout(objectMappingLayout);
             upsertTemplateResponse.layoutId = objectMappingLayoutId;
         }catch (Exception e){
             System.debug(e.getMessage());
@@ -217,7 +217,7 @@ public with sharing class ObjectMappingLayoutController {
         if(sourceRecordId == null) {
             return new List<ObjectMappingLayout>();
         }
-        return OBJECT_MAPPING_LAYOUT_SERVICE
+        return OBJECT_MAPPING_LAYOUT_SELECTOR
               .getObjectMappingLayoutsByParentSourceObject(sourceRecordId.getSobjectType().getDescribe().getName());
     }
     /**

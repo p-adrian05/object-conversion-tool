@@ -1,7 +1,8 @@
 public with sharing class ObjectMappingTemplateController {
     @TestVisible
-    private static ObjectMappingTemplateService OBJECT_MAPPING_TEMPLATE_SERVICE =
-            new ObjectMappingTemplateServiceImpl(new ObjectMappingTemplateRepositoryImpl());
+    private static ObjectMappingTemplateService OBJECT_MAPPING_TEMPLATE_SERVICE = new ObjectMappingTemplateServiceImpl();
+    @TestVisible
+    private static ObjectMappingTemplatesSelector OBJECT_MAPPING_TEMPLATE_SELECTOR = new ObjectMappingTemplatesSelector();
 
     /**
       * Returns a list of all ObjectMappingTemplate records that map the given source and target objectApiNames.
@@ -22,7 +23,7 @@ public with sharing class ObjectMappingTemplateController {
     @AuraEnabled(Cacheable=true)
     public static List<ObjectMappingTemplate> getMappingTemplatesByObjectApiNames(List<String> sourceObjectApiNames,
                                                                 List<String> targetObjectApiNames){
-        return OBJECT_MAPPING_TEMPLATE_SERVICE.getObjectMappingTemplates(sourceObjectApiNames,
+        return OBJECT_MAPPING_TEMPLATE_SELECTOR.getObjectMappingTemplates(sourceObjectApiNames,
                                                                             targetObjectApiNames);
     }
     /**
@@ -80,7 +81,9 @@ public with sharing class ObjectMappingTemplateController {
     @AuraEnabled(Cacheable=true)
     public static ObjectMappingTemplate getMappingTemplateById(Id mappingTemplateId){
         ObjectUtil.requireNonNull(mappingTemplateId, 'mappingTemplateId cannot be null to retrieve a mapping template.');
-        return OBJECT_MAPPING_TEMPLATE_SERVICE.getObjectMappingTemplate(mappingTemplateId);
+        List<ObjectMappingTemplate> objectMappingTemplates =
+                OBJECT_MAPPING_TEMPLATE_SELECTOR.getObjectMappingTemplates(new Set<Id>{mappingTemplateId});
+        return objectMappingTemplates.isEmpty() ? null : objectMappingTemplates[0];
     }
     /**
       * Upserts the given ObjectMappingTemplate record.

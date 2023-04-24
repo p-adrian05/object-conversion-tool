@@ -123,10 +123,10 @@ private class ObjectUtilTest {
         insert acc;
 
         String nameValue = ObjectUtil.getFieldStringValue(acc, Account.Name);
-        System.assertEquals(accountName, nameValue);
+        Assert.areEqual(accountName, nameValue);
 
         String nullSObjectValue = ObjectUtil.getFieldStringValue(null, Account.Name);
-        System.assertEquals(null, nullSObjectValue);
+        Assert.isNull(nullSObjectValue);
     }
 
     @IsTest
@@ -135,13 +135,13 @@ private class ObjectUtilTest {
         insert con;
 
         Boolean emailOptOutValue = ObjectUtil.getFieldBooleanValue(con, Contact.DoNotCall);
-        System.assertEquals(true, emailOptOutValue);
+        Assert.isTrue(emailOptOutValue);
 
         Boolean nullSObjectValue = ObjectUtil.getFieldBooleanValue(null, Contact.DoNotCall);
-        System.assertEquals(null, nullSObjectValue);
+        Assert.isNull(nullSObjectValue);
 
         Boolean nonBooleanValue = ObjectUtil.getFieldBooleanValue(con, Contact.Id);
-        System.assertEquals(null, nonBooleanValue);
+        Assert.isNull(nonBooleanValue);
 
     }
 

@@ -6,24 +6,6 @@ public interface ObjectMappingTemplateService {
         */
     Id upsertObjectMappingTemplate(ObjectMappingTemplate objectMappingTemplate);
     /**
-        Retrieves the Object_Mapping_Template__c records represented in ObjectMappingTemplate object that
-        matches the specified templateId.
-
-        @param templateId the Id of the Object_Mapping_Template__c record to retrieve.
-        @return the ObjectMappingTemplate object that matches the specified templateId.
-        */
-    ObjectMappingTemplate getObjectMappingTemplate(Id templateId);
-    /**
-        Retrieves a list of Object_Mapping_Template__c records represented in ObjectMappingTemplate objects that match
-        the specified sourceObjectApiNames and targetObjectsApiNames.
-
-        @param sourceObjectApiNames a list of source object API names to match against.
-        @param targetObjectsApiNames a list of target object API names to match against.
-        @return a list of ObjectMappingTemplate objects that match the specified sourceObjectApiNames and targetObjectsApiNames.
-*/
-    List<ObjectMappingTemplate> getObjectMappingTemplates(List<String> sourceObjectApiNames,
-                                                            List<String> targetObjectsApiNames);
-    /**
       Deletes the the Object_Mapping_Template__c record represented in ObjectMappingTemplate object
       that matches the specified templateId.
 

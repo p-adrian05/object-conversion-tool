@@ -4,10 +4,10 @@ public interface ObjectMappingLayoutConverterService {
 
         @param sourceRecordId the ID of the source record to be converted
         @param objectMappingLayoutId the ID of the object mapping layout to be used for the conversion
-        @param objectMappingLayoutService the object mapping layout service to be used to retrieve the object mapping layout
+        @param objectMappingLayoutSelector the object mapping layout selector to be used to retrieve the object mapping layout
         @return an ObjectConversionResult object that contains the converted parent record and a list of converted related child records.
     */
-    ObjectConversionResult convertObject(Id sourceRecordId,Id objectMappingLayoutId,ObjectMappingLayoutService objectMappingLayoutService);
+    ObjectConversionResult convertObject(Id sourceRecordId,Id objectMappingLayoutId, ObjectMappingLayoutsSelector objectMappingLayoutSelector);
     /**
        Converts an SObject record and its related records using the specified object mapping layout.
 

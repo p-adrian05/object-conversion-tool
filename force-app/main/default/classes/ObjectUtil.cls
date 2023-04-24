@@ -81,14 +81,13 @@ public with sharing class ObjectUtil {
       The getFieldValue method is used to retrieve the value of a specific field from a given SObject.
       @param sObjectSource The SObject from which the value should be retrieved.
       @param fieldToGetValue The SObjectField that represents the field from which the value should be retrieved.
-      @return The value of the field, or null if an exception is thrown while trying to retrieve the value.
+      @return The value of the field, or null if the field is not set on the SObject.
   */
     public static Object getFieldValue(SObject sObjectSource, SObjectField fieldToGetValue){
         Object value;
-        try{
+
+        if(sObjectSource!=null && sObjectSource.isSet(fieldToGetValue)){
             value = sObjectSource.get(fieldToGetValue.getDescribe().getName());
-        }catch (Exception e){
-            return null;
         }
         return value;
     }
@@ -128,5 +127,20 @@ public with sharing class ObjectUtil {
         Map<String, Schema.SObjectField> sObjectFields = type.getDescribe().fields.getMap();
 
         return sObjectFields.values();
+    }
+    /**
+     * Executes a SOQL query without enforcing sharing rules.
+     *
+     * @param query      the SOQL query to be executed
+     * @param bindMap    a map of named parameter bindings for the query
+     * @return a list of SObject records resulting from the query
+     */
+    public static List<SObject> executeQueryWithoutSharing(String query,Map<String,Object> bindMap){
+        return new WithoutSharingContext().executeQuery(query,bindMap);
+    }
+    without sharing class WithoutSharingContext{
+        public List<SObject> executeQuery(String query,Map<String,Object> bindMap){
+            return Database.queryWithBinds(query,bindMap,AccessLevel.SYSTEM_MODE);
+        }
     }
 }

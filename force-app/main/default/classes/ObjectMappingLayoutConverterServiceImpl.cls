@@ -11,19 +11,26 @@ public with sharing class ObjectMappingLayoutConverterServiceImpl implements Obj
 
          @param sourceRecordId the ID of the source record to be converted
          @param objectMappingLayoutId the ID of the object mapping layout to be used for the conversion
-         @param objectMappingLayoutService the object mapping layout service to be used to retrieve the object mapping layout
+         @param objectMappingLayoutSelector the object mapping layout selector to be used to retrieve the object mapping layout
          @return an ObjectConversionResult object that contains the converted parent record and a list of converted related child records.
      */
-    public ObjectConversionResult convertObject(Id sourceRecordId,Id objectMappingLayoutId,ObjectMappingLayoutService objectMappingLayoutService){
+    public ObjectConversionResult convertObject(Id sourceRecordId,Id objectMappingLayoutId, ObjectMappingLayoutsSelector objectMappingLayoutSelector){
         ObjectUtil.requireNonNull(sourceRecordId,'sourceRecordId cannot be null to convert an object!');
         ObjectUtil.requireNonNull(objectMappingLayoutId,'objectMappingLayoutId cannot be null to convert an object!');
-        ObjectUtil.requireNonNull(objectMappingLayoutService,'objectMappingLayoutService cannot be null!');
+        ObjectUtil.requireNonNull(objectMappingLayoutSelector,'objectMappingLayoutService cannot be null!');
 
-        ObjectMappingLayout objectMappingLayout = objectMappingLayoutService.getObjectMappingLayoutForConversion(objectMappingLayoutId);
+        ObjectMappingLayout objectMappingLayout = new SelectObjectMappingLayout()
+                .selectObjectMappingLayout(objectMappingLayoutSelector,objectMappingLayoutId);
 
         ObjectUtil.requireNonNull(objectMappingLayout,'No object mapping layout found for id: '+objectMappingLayoutId);
         return convertObject(sourceRecordId,objectMappingLayout);
     }
+    private without sharing class SelectObjectMappingLayout{
+        public ObjectMappingLayout selectObjectMappingLayout(ObjectMappingLayoutsSelector objectMappingLayoutSelector, Id objectMappingLayoutId) {
+            return objectMappingLayoutSelector.getObjectMappingLayoutWithObjectMappings(objectMappingLayoutId,true);
+        }
+    }
+
     /**
        Converts an SObject record and its related records using the specified object mapping layout.
 
@@ -36,14 +43,23 @@ public with sharing class ObjectMappingLayoutConverterServiceImpl implements Obj
         validateObjectMappingLayout(objectMappingLayout);
         //convert parent record
         SObject parentTargetRecord = convertParentRecord(sourceRecordId,objectMappingLayout.parentMapping);
-        ObjectUtil.requireNonNull(parentTargetRecord,'Failed to convert parent record! No record found for object mapping layout: '
+        ObjectUtil.requireNonNull(parentTargetRecord,'Failed to convert parent record! (Or you dont have access to the record!) ' +
+                'No record found for object mapping layout: '
                 +objectMappingLayout.id + ' and source record id: '+sourceRecordId);
-
-        insert parentTargetRecord;
-
-        //convert related records
-        List<SObject> relatedRecords = convertRelatedRecords(sourceRecordId,parentTargetRecord.Id,objectMappingLayout.childMappings);
-
+        if(!parentTargetRecord.getSObjectType().getDescribe().isCreateable()){
+            throw new SObjectException('Do not have permission to create object:' +
+                    ' '+parentTargetRecord.getSObjectType().getDescribe().getName()+'!');
+        }
+        Savepoint savepoint = Database.setSavepoint();
+        List<SObject> relatedRecords = new List<SObject>();
+        try{
+            insert parentTargetRecord;
+            relatedRecords = convertRelatedRecords(sourceRecordId,parentTargetRecord.Id,objectMappingLayout.childMappings);
+            insert relatedRecords;
+        }catch (Exception e){
+            Database.rollback(savepoint);
+            throw e;
+        }
         return new ObjectConversionResult(parentTargetRecord,relatedRecords);
     }
     private SObject convertParentRecord(Id parentRecordId,ObjectMapping parentObjectMapping){
@@ -78,7 +94,6 @@ public with sharing class ObjectMappingLayoutConverterServiceImpl implements Obj
                 relatedTargetRecordsToInsert.add(relatedTargetRecord);
             }
         }
-        insert relatedTargetRecordsToInsert;
         return relatedTargetRecordsToInsert;
     }
     /**
@@ -161,7 +176,7 @@ public with sharing class ObjectMappingLayoutConverterServiceImpl implements Obj
         }
         System.debug('Related records query: '+queryStr);
         System.debug('Bind variables map: '+objectFilterBinds);
-        for(SObject sourceRecord:Database.queryWithBinds(queryStr,objectFilterBinds,AccessLevel.SYSTEM_MODE)){
+        for(SObject sourceRecord:ObjectUtil.executeQueryWithoutSharing(queryStr,objectFilterBinds)){
             relatedRecords.add(sourceRecord);
         }
         return relatedRecords;

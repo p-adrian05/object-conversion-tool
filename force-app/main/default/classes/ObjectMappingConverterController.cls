@@ -2,7 +2,7 @@ public with sharing class ObjectMappingConverterController {
     @TestVisible
     private static ObjectMappingTemplateConverter OBJECT_MAPPING_TEMPLATE_CONVERTER = new ObjectMappingTemplateConverterImpl();
     @TestVisible
-    private static ObjectMappingLayoutService OBJECT_MAPPING_LAYOUT_SERVICE = new ObjectMappingLayoutServiceImpl();
+    private static ObjectMappingLayoutsSelector OBJECT_MAPPING_LAYOUT_SELECTOR = new ObjectMappingLayoutsSelector();
     @TestVisible
     private static ObjectMappingLayoutConverterService OBJECT_MAPPING_LAYOUT_CONVERTER_SERVICE =
                                         new ObjectMappingLayoutConverterServiceImpl(OBJECT_MAPPING_TEMPLATE_CONVERTER);
@@ -20,7 +20,7 @@ public with sharing class ObjectMappingConverterController {
         ObjectUtil.requireNonNull(objectMappingLayoutId, 'ObjectMappingLayoutId cannot be null to convert an object!');
         try{
             ObjectConversionResult conversionResult = OBJECT_MAPPING_LAYOUT_CONVERTER_SERVICE.convertObject(sourceRecordId,
-                    objectMappingLayoutId,OBJECT_MAPPING_LAYOUT_SERVICE);
+                    objectMappingLayoutId,OBJECT_MAPPING_LAYOUT_SELECTOR);
             return conversionResult.parentRecord?.Id;
         }catch (Exception e){
             System.debug(e.getMessage());

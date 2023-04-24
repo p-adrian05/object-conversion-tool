@@ -60,14 +60,14 @@ private class ObjectMappingLayoutConverterServiceTest {
         objectMappingLayoutModel.parentMapping = accountToContactMapping;
 
         //setting up the stubs
-        Stub objectMappingLayoutServiceStub = new Stub(ObjectMappingLayoutService.class);
-        objectMappingLayoutServiceStub.setReturnValue('getObjectMappingLayoutForConversion',objectMappingLayoutModel);
+        Stub objectMappingLayoutSelectorStub = new Stub(ObjectMappingLayoutsSelector.class);
+        objectMappingLayoutSelectorStub.setReturnValue('getObjectMappingLayoutWithObjectMappings',objectMappingLayoutModel);
         ObjectMappingLayoutConverterServiceImpl objectMappingLayoutConverterService =
                 new ObjectMappingLayoutConverterServiceImpl(new ObjectMappingTemplateConverterImpl());
 
         //When
         ObjectConversionResult objectConversionResult = objectMappingLayoutConverterService.convertObject(sourceAccount.Id,
-                            objectMappingLayoutModel.id,(ObjectMappingLayoutService) objectMappingLayoutServiceStub.instance);
+                            objectMappingLayoutModel.id,(ObjectMappingLayoutsSelector) objectMappingLayoutSelectorStub.instance);
 
         //Then
         Assert.areEqual(0,objectConversionResult.relatedRecords.size());
@@ -150,16 +150,6 @@ private class ObjectMappingLayoutConverterServiceTest {
         contactChildMapping.template = contactChildMappingTemplate;
         contactChildMapping.sourceObjectRelationship = new ObjectRelationship('Contacts','AccountId');
         contactChildMapping.targetObjectRelationship = new ObjectRelationship('Test','TestId');
-        //setting up the filter
-        ObjectFilter objectFilter = new ObjectFilter();
-        objectFilter.operatorValue = '=';
-        objectFilter.field = contactPhoneFromField;
-        objectFilter.operatorValue = contact.Phone;
-        objectFilter.bindVariable = 'value1';
-        FilterState filterState = new FilterState();
-        filterState.filterStringWithBinds = 'Phone = :value1';
-        filterState.filterList = new List<ObjectFilter>{objectFilter};
-        contactChildMapping.filterState = filterState;
 
         //setting up the stubs
         Stub objectTemplateConverterStub = new Stub(ObjectMappingTemplateConverter.class);

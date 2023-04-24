@@ -10,8 +10,8 @@ public class ObjectMappingTemplateControllerTest {
         ObjectMappingTemplate objectMappingTemplateToReturn =
                 ObjectMappingTemplateDataFactory.createObjectMappingTemplateModel('Account','Opportunity');
 
-        Stub repositoryStub = new Stub(ObjectMappingTemplateServiceImpl.class);
-        ObjectMappingTemplateController.OBJECT_MAPPING_TEMPLATE_SERVICE = (ObjectMappingTemplateServiceImpl) repositoryStub.instance;
+        Stub repositoryStub = new Stub(ObjectMappingTemplatesSelector.class);
+        ObjectMappingTemplateController.OBJECT_MAPPING_TEMPLATE_SELECTOR = (ObjectMappingTemplatesSelector) repositoryStub.instance;
 
         List<ObjectMappingTemplate> mappingTemplatesToReturn = new List<ObjectMappingTemplate>{objectMappingTemplateToReturn};
         repositoryStub.setReturnValue('getObjectMappingTemplates', mappingTemplatesToReturn);
@@ -34,16 +34,16 @@ public class ObjectMappingTemplateControllerTest {
                 ObjectMappingTemplateDataFactory.createObjectMappingTemplateModel(objectMappingTemplate.Source_Object_Api_Name__c,
                                                     objectMappingTemplate.Target_Object_Api_Name__c);
 
-        Stub repositoryStub = new Stub(ObjectMappingTemplateServiceImpl.class);
-        ObjectMappingTemplateController.OBJECT_MAPPING_TEMPLATE_SERVICE = (ObjectMappingTemplateServiceImpl) repositoryStub.instance;
+        Stub repositoryStub = new Stub(ObjectMappingTemplatesSelector.class);
+        ObjectMappingTemplateController.OBJECT_MAPPING_TEMPLATE_SELECTOR = (ObjectMappingTemplatesSelector) repositoryStub.instance;
 
-        repositoryStub.setReturnValue('getObjectMappingTemplate', objectMappingTemplateToReturn);
+        repositoryStub.setReturnValue('getObjectMappingTemplates',new List<ObjectMappingTemplate>{objectMappingTemplateToReturn});
 
         //When
          ObjectMappingTemplate actualTemplate =
                 ObjectMappingTemplateController.getMappingTemplateById(objectMappingTemplate.Id);
         //Then
-        repositoryStub.assertInvoked('getObjectMappingTemplate');
+        repositoryStub.assertInvoked('getObjectMappingTemplates');
         System.assertEquals(objectMappingTemplateToReturn,actualTemplate);
     }
     @IsTest

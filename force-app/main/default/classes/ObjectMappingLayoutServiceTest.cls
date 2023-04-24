@@ -1,120 +1,105 @@
 @IsTest
 public with sharing class ObjectMappingLayoutServiceTest {
-
     @IsTest
-    public static void testGetObjectMappingLayoutForDisplayShouldReturnSObjectMappedToWrapperObject() {
+    static void testInsertNewObjectMappingLayout() {
         //Given
-        ObjectMappingLayoutDataFactory.ObjectMappingLayoutResult mappingLayoutResult =
-                                ObjectMappingLayoutDataFactory.createObjectMappingLayoutWithParentAndChildMapping();
-
-        Object_Mapping_Layout__c mappingLayout = mappingLayoutResult.objectMappingLayout;
-        Object_Mapping_Template__c childObjectMappingTemplate = mappingLayoutResult.childObjectMappingTemplates.get(0);
-        Object_Mapping__c parentObjectMapping = mappingLayoutResult.parentObjectMapping;
-        Object_Mapping__c childObjectMapping = mappingLayoutResult.childObjectMappings.get(0);
-
+        ObjectMappingLayout objectMappingLayoutModel = ObjectMappingLayoutDataFactory.createObjectMappingLayoutModel();
         ObjectMappingLayoutService objectMappingLayoutService = new ObjectMappingLayoutServiceImpl();
+
         //When
-        ObjectMappingLayout actualObjectMappingLayoutModel = objectMappingLayoutService.getObjectMappingLayoutForDisplay(mappingLayout.Id);
+        Id actualObjectMappingLayoutId = objectMappingLayoutService.upsertObjectMappingLayout(objectMappingLayoutModel);
 
         //Then
-        Assert.isNull(actualObjectMappingLayoutModel.parentMapping.template.fieldMappings);
-        Assert.areEqual(mappingLayout.Name,actualObjectMappingLayoutModel.name);
-        Assert.areEqual(mappingLayout.Id, actualObjectMappingLayoutModel.id);
-        Assert.areEqual(mappingLayout.IsDefault__c, actualObjectMappingLayoutModel.isDefault);
-        Assert.areEqual(parentObjectMapping.Id, actualObjectMappingLayoutModel.parentMapping.id);
-
-        ObjectMapping actualChildObjectMappingModel = actualObjectMappingLayoutModel.childMappings[0];
-        Assert.isNull(actualChildObjectMappingModel.template.fieldMappings);
-
-        Assert.areEqual(childObjectMapping.Source_Object_Relationship_JSON__c, JSON.serialize(actualChildObjectMappingModel.sourceObjectRelationship));
-        Assert.areEqual(childObjectMapping.Target_Object_Relationship_JSON__c, JSON.serialize(actualChildObjectMappingModel.targetObjectRelationship));
-        Assert.isNotNull(actualChildObjectMappingModel.filterState);
-        Assert.areEqual(childObjectMapping.External_Id__c, actualChildObjectMappingModel.externalId);
-
-        Assert.areEqual(childObjectMappingTemplate.Id, actualChildObjectMappingModel.template.id);
-        Assert.areEqual(childObjectMappingTemplate.Target_Object_Api_Name__c, actualChildObjectMappingModel.template.targetObjectApiName);
-        Assert.areEqual(childObjectMappingTemplate.Source_Object_Api_Name__c, actualChildObjectMappingModel.template.sourceObjectApiName);
-
+        assertObjectMappingLayout(objectMappingLayoutModel, actualObjectMappingLayoutId);
     }
     @IsTest
-    public static void testGetObjectMappingLayoutForConversionShouldReturnSObjectMappedToWrapperObject() {
-        //Create templates
-        ObjectMappingLayoutDataFactory.ObjectMappingLayoutResult mappingLayoutResult =
-                ObjectMappingLayoutDataFactory.createObjectMappingLayoutWithParentAndChildMapping();
+    static void testUpdateObjectMappingLayout() {
+        //Given
+        ObjectMappingLayout objectMappingLayoutModel = ObjectMappingLayoutDataFactory.createObjectMappingLayoutModel();
+        objectMappingLayoutModel.id = ObjectMappingLayoutDataFactory.createObjectMappingLayout(objectMappingLayoutModel.name,true).Id;
+        objectMappingLayoutModel.parentMapping.id = ObjectMappingLayoutDataFactory.createObjectMapping(objectMappingLayoutModel.id,objectMappingLayoutModel.parentMapping.template.id,true).Id;
 
-        Object_Mapping_Layout__c mappingLayout = mappingLayoutResult.objectMappingLayout;
-        Object_Mapping_Template__c childObjectMappingTemplate = mappingLayoutResult.childObjectMappingTemplates.get(0);
-        Object_Mapping_Template__c parentObjectMappingTemplate = mappingLayoutResult.parentObjectMappingTemplate;
-        Object_Mapping__c parentObjectMapping = mappingLayoutResult.parentObjectMapping;
-        Object_Mapping__c childObjectMapping = mappingLayoutResult.childObjectMappings.get(0);
+        ObjectMapping childObjectMapping = objectMappingLayoutModel.childMappings.get(0);
+        childObjectMapping.id = ObjectMappingLayoutDataFactory.createObjectMapping(objectMappingLayoutModel.id,childObjectMapping.template.id,true).Id;
 
         ObjectMappingLayoutService objectMappingLayoutService = new ObjectMappingLayoutServiceImpl();
+
         //When
-        ObjectMappingLayout actualObjectMappingLayoutModel = objectMappingLayoutService.getObjectMappingLayoutForConversion(mappingLayout.Id);
+        Id actualObjectMappingLayoutId = objectMappingLayoutService.upsertObjectMappingLayout(objectMappingLayoutModel);
 
-        // Assert the result
-        Assert.isNull(actualObjectMappingLayoutModel.name);
-        Assert.isNotNull(actualObjectMappingLayoutModel.parentMapping.template.fieldMappings);
-
-        Assert.areEqual(mappingLayout.Id, actualObjectMappingLayoutModel.id);
-        Assert.areEqual(mappingLayout.IsDefault__c, actualObjectMappingLayoutModel.isDefault);
-        Assert.areEqual(parentObjectMapping.Id, actualObjectMappingLayoutModel.parentMapping.id);
-
-        Assert.areEqual(parentObjectMappingTemplate.Id, actualObjectMappingLayoutModel.parentMapping.template.id);
-
-        ObjectMapping actualChildObjectMappingModel = actualObjectMappingLayoutModel.childMappings[0];
-        Assert.isNotNull(actualChildObjectMappingModel.template.fieldMappings);
-        Assert.isNotNull(actualChildObjectMappingModel.filterState);
-        Assert.areEqual(childObjectMapping.Source_Object_Relationship_JSON__c, JSON.serialize(actualChildObjectMappingModel.sourceObjectRelationship));
-        Assert.areEqual(childObjectMapping.Target_Object_Relationship_JSON__c, JSON.serialize(actualChildObjectMappingModel.targetObjectRelationship));
-
-        Assert.areEqual(childObjectMappingTemplate.Id, actualChildObjectMappingModel.template.id);
-        Assert.areEqual(childObjectMappingTemplate.Target_Object_Api_Name__c, actualChildObjectMappingModel.template.targetObjectApiName);
-        Assert.areEqual(childObjectMappingTemplate.Source_Object_Api_Name__c, actualChildObjectMappingModel.template.sourceObjectApiName);
+        //Then
+        assertObjectMappingLayout(objectMappingLayoutModel, actualObjectMappingLayoutId);
     }
+    private static void assertObjectMappingLayout(ObjectMappingLayout actualObjectMappingLayoutModel, Id actualObjectMappingLayoutId) {
+        Map<Id, ObjectMapping> objectTemplateIdObjectMappingMap = new Map<Id, ObjectMapping>();
 
-    @IsTest
-    public static void testGetObjectMappingLayoutsShouldReturnSObjectsMappedToWrapperObject() {
-        //Given
-        List<Object_Mapping_Layout__c> testObjectMappingLayouts = ObjectMappingLayoutDataFactory.createObjectMappingLayouts(5,true);
-        Map<Id,Object_Mapping_Layout__c> testObjectMappingLayoutsMap = new Map<Id,Object_Mapping_Layout__c>();
-        for(Object_Mapping_Layout__c layout : testObjectMappingLayouts){
-            testObjectMappingLayoutsMap.put(layout.Id,layout);
+        objectTemplateIdObjectMappingMap.put(actualObjectMappingLayoutModel.parentMapping.template.id, actualObjectMappingLayoutModel.parentMapping);
+        for (ObjectMapping objectMapping : actualObjectMappingLayoutModel.childMappings) {
+            objectTemplateIdObjectMappingMap.put(objectMapping.template.id, objectMapping);
         }
 
-        ObjectMappingLayoutService objectMappingLayoutService = new ObjectMappingLayoutServiceImpl();
-        //When
-        List<ObjectMappingLayout> actualObjectMappingLayouts = objectMappingLayoutService.getObjectMappingLayouts();
+        Object_Mapping_Layout__c actualObjectMappingLayout = [
+                SELECT Id, Name, Description__c, IsDefault__c, (
+                        SELECT Id,
+                                Object_Mapping_Template__c,
+                                Source_Object_Relationship_JSON__c,
+                                Filter_State_JSON__c,
+                                Target_Object_Relationship_JSON__c
+                        FROM Object_Mappings__r
+                )
+                FROM Object_Mapping_Layout__c
+                WHERE Id = :actualObjectMappingLayoutId
+        ];
 
-        //Then
-        for(ObjectMappingLayout actualObjectMappingLayout : actualObjectMappingLayouts) {
-            Object_Mapping_Layout__c expectedObjectMappingLayout =  testObjectMappingLayoutsMap.get(actualObjectMappingLayout.id);
-            Assert.areEqual(expectedObjectMappingLayout.Name,actualObjectMappingLayout.name);
-            Assert.areEqual(expectedObjectMappingLayout.IsDefault__c, actualObjectMappingLayout.isDefault);
-            Assert.areEqual(expectedObjectMappingLayout.Description__c, actualObjectMappingLayout.description);
+        Assert.areEqual(actualObjectMappingLayoutModel.name, actualObjectMappingLayout.Name);
+        Assert.areEqual(actualObjectMappingLayoutModel.isDefault, actualObjectMappingLayout.IsDefault__c);
+        Assert.areEqual(actualObjectMappingLayoutModel.description, actualObjectMappingLayout.Description__c);
+        Assert.areEqual(actualObjectMappingLayoutModel.childMappings.size() + 1, actualObjectMappingLayout.Object_Mappings__r.size());
+
+        for (Object_Mapping__c actualObjectMapping : actualObjectMappingLayout.Object_Mappings__r) {
+            ObjectMapping expectedObjectMapping = objectTemplateIdObjectMappingMap.get(actualObjectMapping.Object_Mapping_Template__c);
+
+            Assert.areEqual(expectedObjectMapping.sourceObjectRelationship, JSON.deserialize(actualObjectMapping.Source_Object_Relationship_JSON__c, ObjectRelationship.class));
+            Assert.areEqual(expectedObjectMapping.targetObjectRelationship, JSON.deserialize(actualObjectMapping.Target_Object_Relationship_JSON__c, ObjectRelationship.class));
+            Assert.areEqual(expectedObjectMapping.filterState, JSON.deserialize(actualObjectMapping.Filter_State_JSON__c, FilterState.class));
         }
     }
-    @IsTest
-    public static void testGetObjectMappingLayoutsByParentSourceObjectShouldReturnSObjectsMappedToWrapperObject() {
-        //Given
-        ObjectMappingLayoutDataFactory.createObjectMappingLayouts(5,true);
-        ObjectMappingLayoutDataFactory.ObjectMappingLayoutResult createObjectMappingLayoutResult =
-                                                                ObjectMappingLayoutDataFactory.createObjectMappingLayoutWithParentAndChildMapping();
 
-        ObjectMappingLayoutService objectMappingLayoutService = new ObjectMappingLayoutServiceImpl();
+    @IsTest
+    static void testRemoveUnlinkedObjectMappingsWhenThereAreUnlinkedObjectMappings() {
+        //Given
+        Object_Mapping_Template__c oppToOrderTemplate =
+                ObjectMappingTemplateDataFactory.createObjectMappingTemplate('Test','Opportunity','Order',true);
+        Object_Mapping_Layout__c objectMappingLayout = ObjectMappingLayoutDataFactory.createObjectMappingLayout('Test',true);
+        List<Object_Mapping__c> objectMappings = new List<Object_Mapping__c>();
+        for (Integer i = 0; i < 5; i++) {
+            Object_Mapping__c objectMapping = new Object_Mapping__c();
+            objectMapping.Object_Mapping_Layout__c = objectMappingLayout.Id;
+            objectMapping.Object_Mapping_Template__c = oppToOrderTemplate.Id;
+            objectMappings.add(objectMapping);
+        }
+        insert objectMappings;
+        //Set up the old object mappings
+        List<Id> oldObjectMappingIds = new List<Id>();
+        for (Object_Mapping__c objectMapping : objectMappings) {
+            oldObjectMappingIds.add(objectMapping.Id);
+        }
+        //set up the new object mappings
+        List<Object_Mapping__c> newObjectMappings = new List<Object_Mapping__c>();
+        newObjectMappings.add(objectMappings.get(0));
+        newObjectMappings.add(objectMappings.get(1));
+
+        ObjectMappingLayoutServiceImpl objectMappingLayoutService = new ObjectMappingLayoutServiceImpl();
         //When
-        List<ObjectMappingLayout> actualObjectMappingLayouts = objectMappingLayoutService.getObjectMappingLayoutsByParentSourceObject(
-                                                                createObjectMappingLayoutResult
-                                                                        .parentObjectMappingTemplate
-                                                                        .Source_Object_Api_Name__c);
+        List<Object_Mapping__c> removedObjectMappings = objectMappingLayoutService.removeUnlinkedObjectMappings(oldObjectMappingIds,newObjectMappings);
 
         //Then
-        Assert.areEqual(1,actualObjectMappingLayouts.size());
-        Object_Mapping_Layout__c expectedObjectMappingLayout = createObjectMappingLayoutResult.objectMappingLayout;
-        Assert.areEqual(expectedObjectMappingLayout.Name,actualObjectMappingLayouts.get(0).name);
-        Assert.areEqual(expectedObjectMappingLayout.IsDefault__c, actualObjectMappingLayouts.get(0).isDefault);
-        Assert.areEqual(expectedObjectMappingLayout.Description__c, actualObjectMappingLayouts.get(0).description);
+        Assert.areEqual(3, removedObjectMappings.size());
+        for(Object_Mapping__c removedObjectMapping : removedObjectMappings) {
+            Assert.isTrue(!newObjectMappings.contains(removedObjectMapping));
+        }
     }
+
     @IsTest
     public static void testDeleteObjectMappingLayout() {
         //Given

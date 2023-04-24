@@ -58,6 +58,9 @@ public with sharing class ObjectMappingTemplate {
      */
     public static List<ObjectMappingTemplate> ofSObjects(List<Object_Mapping_Template__c> objectMappingTemplateSObjects){
         List<ObjectMappingTemplate> objectMappingTemplates = new List<ObjectMappingTemplate>();
+        if(objectMappingTemplateSObjects==null||objectMappingTemplateSObjects.size()==0){
+            return objectMappingTemplates;
+        }
         for(Object_Mapping_Template__c objectMappingTemplateSObject : objectMappingTemplateSObjects){
             objectMappingTemplates.add(ObjectMappingTemplate.ofSObject(objectMappingTemplateSObject));
         }
