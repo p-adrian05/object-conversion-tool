@@ -3,8 +3,8 @@
     {
       "path": "force-app",
       "package": "Object Conversion Tool",
-      "versionName": "ver 1.2",
-      "versionNumber": "1.2.0.NEXT",
+      "versionName": "ver 2.0",
+      "versionNumber": "2.0.0.NEXT",
       "default": true,
       "versionDescription": ""
     }
@@ -19,6 +19,10 @@
     "Object Conversion Tool@1.0.0-2": "04t68000000t30LAAQ",
     "Object Conversion Tool@1.1.0-1": "04t68000000t30QAAQ",
     "Object Conversion Tool@1.1.0-2": "04t68000000t30VAAQ",
-    "Object Conversion Tool@1.2.0-1": "04t68000000t30aAAA"
+    "Object Conversion Tool@1.2.0-1": "04t68000000t30aAAA",
+    "Object Conversion Tool@2.0.0-1": "04t68000000t34xAAA",
+    "Object Conversion Tool@2.0.0-2": "04t68000000t352AAA",
+    "Object Conversion Tool@2.0.0-3": "04t68000000t357AAA",
+    "Object Conversion Tool@2.0.0-4": "04t68000000t35CAAQ"
   }
 }

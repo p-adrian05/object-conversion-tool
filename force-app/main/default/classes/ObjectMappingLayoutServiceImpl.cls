@@ -175,10 +175,6 @@ public with sharing class ObjectMappingLayoutServiceImpl implements ObjectMappin
     public void markDefaultObjectMappingLayout(Id objectMappingLayoutId){
         ObjectUtil.requireNonNull(objectMappingLayoutId, 'objectMappingLayoutId cannot be null to mark ObjectMappingLayout as default.');
 
-        if(!Object_Mapping_Layout__c.IsDefault__c.getDescribe().isUpdateable()){
-            throw new SObjectException('Do not have permission to mark default Object_Mapping_Layout__c records.');
-        }
-
         String parentSourceObjectApiName = [SELECT Parent_Source_Object_Api_Name__c FROM Object_Mapping_Layout__c
                                         WHERE Id =:objectMappingLayoutId]?.Parent_Source_Object_Api_Name__c;
 
