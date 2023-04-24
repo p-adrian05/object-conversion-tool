@@ -3,38 +3,22 @@ package Backend{
 package "ObjectMappingTemplateModule"{
     interface ObjectMappingTemplateService {
         + Id upsertObjectMappingTemplate(ObjectMappingTemplate objectMappingTemplate)
-        + ObjectMappingTemplate getObjectMappingTemplate(Id templateId)
-        + List<ObjectMappingTemplate> getObjectMappingTemplates(List<String> sourceObjectApiNames, List<String> targetObjectsApiNames)
         + void deleteObjectMappingTemplate(Id templateId)
     }
     class ObjectMappingTemplateServiceImpl {
-        - ObjectMappingTemplateRepository objectMappingTemplateRepository;
-
-        + ObjectMappingTemplateServiceImpl(ObjectMappingTemplateRepository objectMappingTemplateRepository)
-
         + Id upsertObjectMappingTemplate(ObjectMappingTemplate objectMappingTemplate)
-        + ObjectMappingTemplate getObjectMappingTemplate(Id templateId)
-        + List<ObjectMappingTemplate> getObjectMappingTemplates(List<String> sourceObjectApiNames, List<String> targetObjectsApiNames)
         + void deleteObjectMappingTemplate(Id templateId)
     }
 
-
-    interface ObjectMappingTemplateRepository {
-        + Object_Mapping_Template__c getObjectMappingTemplateRecord(Id recordId)
+    class ObjectMappingTemplatesSelector {
+        + List<ObjectMappingTemplate> getObjectMappingTemplates(Set<Id> templateIds)
         + List<Object_Mapping_Template__c> getMappingTemplates(List<String> sourceObjectApiNames, List<String> targetObjectsApiNames)
 
     }
-    class ObjectMappingTemplateRepositoryImpl {
-         + ObjectMappingTemplateRepositoryImpl()
-
-         + Object_Mapping_Template__c getObjectMappingTemplateRecord(Id recordId)
-         + List<Object_Mapping_Template__c> getMappingTemplates(List<String> sourceObjectApiNames, List<String> targetObjectsApiNames)
-
-    }
-
 
     class ObjectMappingTemplateController{
         - static ObjectMappingTemplateService OBJECT_MAPPING_TEMPLATE_SERVICE
+        - static ObjectMappingTemplatesSelector OBJECT_MAPPING_TEMPLATE_SELECTOR
 
         + {static} List<ObjectMappingTemplate> getMappingTemplatesByObjectApiNames(List<String> sourceObjectApiNames,List<String> targetObjectApiNames)
         + {static} ObjectMappingTemplate getMappingTemplateById(Id mappingTemplateId)
@@ -53,15 +37,14 @@ package "ObjectMappingTemplateModule"{
        + Map<Id, SObject> convertRecords(List<SObject> sourceRecords,ObjectMappingTemplate objectMappingTemplate)
 
        - Object getFieldValueFromSObject(String field,SObject record)
-       -  List<SObject> querySourceRecords(List<Id> sourceRecordIds,ObjectMappingTemplate objectMappingTemplate)
+       - List<SObject> querySourceRecords(List<Id> sourceRecordIds,ObjectMappingTemplate objectMappingTemplate)
        - void validateMappingTemplate(ObjectMappingTemplate objectMappingTemplate)
        - void validateFieldMapping(FieldMapping fieldMapping)
     }
     ObjectMappingTemplateConverterImpl -d|> ObjectMappingTemplateConverter
-    ObjectMappingTemplateServiceImpl -d|> ObjectMappingTemplateService
-    ObjectMappingTemplateRepositoryImpl -d|> ObjectMappingTemplateRepository
-    ObjectMappingTemplateServiceImpl --> ObjectMappingTemplateRepository
+    ObjectMappingTemplateServiceImpl --> ObjectMappingTemplateService
     ObjectMappingTemplateController --> ObjectMappingTemplateService
+    ObjectMappingTemplateController --> ObjectMappingTemplatesSelector
 
   package TemplateModel{
       class ObjectMappingTemplate {
@@ -100,34 +83,26 @@ package "ObjectMappingTemplateModule"{
  package ObjectMappingLayoutModule{
 
     interface ObjectMappingLayoutService {
-     + ObjectMappingLayout getObjectMappingLayoutForDisplay(Id objectMappingLayoutId)
-     + ObjectMappingLayout getObjectMappingLayoutForConversion(Id objectMappingLayoutId)
-     + List<ObjectMappingLayout> getObjectMappingLayouts();
-     + List<ObjectMappingLayout> getObjectMappingLayoutsByParentSourceObject(String sourceObjectApiName)
+     + Id upsertObjectMappingLayout(ObjectMappingLayout objectMappingLayout)
      + void deleteObjectMappingLayout(Id objectMappingLayoutId)
      + void markDefaultObjectMappingLayout(Id objectMappingLayoutId)
     }
     class ObjectMappingLayoutServiceImpl{
-         + ObjectMappingLayout getObjectMappingLayoutForDisplay(Id objectMappingLayoutId)
-         + ObjectMappingLayout getObjectMappingLayoutForConversion(Id objectMappingLayoutId)
-         + List<ObjectMappingLayout> getObjectMappingLayouts();
-         + List<ObjectMappingLayout> getObjectMappingLayoutsByParentSourceObject(String sourceObjectApiName)
+       + Id upsertObjectMappingLayout(ObjectMappingLayout objectMappingLayout)
+           - List<Object_Mapping__c> removeUnlinkedObjectMappings(List<Id> oldObjectMappingIds,
+                List<Object_Mapping__c> newObjectMappingSObjects)
+           - List<Id> getObjectMappingIds(Id mappingLayoutId)
+           - List<Object_Mapping__c> upsertObjectMappings(List<ObjectMapping> objectMappings,Id layoutId)
+
          + void deleteObjectMappingLayout(Id objectMappingLayoutId)
          + void markDefaultObjectMappingLayout(Id objectMappingLayoutId)
-         - ObjectMappingLayout createObjectMappingLayoutWithObjectMappings(Object_Mapping_Layout__c objectMappingLayoutSObject)
     }
-    interface ObjectMappingLayoutUpsertService{
-       Id upsertObjectMappingLayout(ObjectMappingLayout objectMappingLayout)
-    }
-    class ObjectMappingLayoutUpsertServiceImpl{
-       + Id upsertObjectMappingLayout(ObjectMappingLayout objectMappingLayout)
-       - List<Object_Mapping__c> removeUnlinkedObjectMappings(List<Id> oldObjectMappingIds,
-            List<Object_Mapping__c> newObjectMappingSObjects)
-       - List<Id> getObjectMappingIds(Id mappingLayoutId)
-       - List<Object_Mapping__c> upsertObjectMappings(List<ObjectMapping> objectMappings,Id layoutId){
+    class ObjectMappingLayoutsSelector{
+         + ObjectMappingLayout getObjectMappingLayoutWithObjectMappings(Id objectMappingLayoutId,Boolean isFieldMappingsIncluded)
+         + List<ObjectMappingLayout> getObjectMappingLayouts()
+         + List<ObjectMappingLayout> getObjectMappingLayoutsByParentSourceObject(String sourceObjectApiName)
     }
     ObjectMappingLayoutServiceImpl --|> ObjectMappingLayoutService
-    ObjectMappingLayoutUpsertServiceImpl --|> ObjectMappingLayoutUpsertService
 
     package LayoutModel{
          class ObjectMappingLayout {
@@ -176,14 +151,14 @@ package "ObjectMappingTemplateModule"{
      }
 
     interface ObjectMappingLayoutConverterService{
-          + Map<SObject,List<SObject>> convertObject(Id sourceRecordId,Id objectMappingLayoutId)
-          + Map<SObject,List<SObject>> convertObject(Id sourceRecordId,ObjectMappingLayout objectMappingLayout)
+        + ObjectConversionResult convertObject(Id sourceRecordId,Id objectMappingLayoutId, ObjectMappingLayoutsSelector objectMappingLayoutSelector)
+        + ObjectConversionResult convertObject(Id sourceRecordId,ObjectMappingLayout objectMappingLayout)
     }
     class ObjectMappingLayoutConverterServiceImpl{
         - ObjectMappingTemplateConverter objectMappingTemplateConverter
 
          + ObjectMappingLayoutConverterServiceImpl(ObjectMappingTemplateConverter objectMappingTemplateConverter)
-        + ObjectConversionResult convertObject(Id sourceRecordId,Id objectMappingLayoutId,ObjectMappingLayoutService objectMappingLayoutService)
+         + ObjectConversionResult convertObject(Id sourceRecordId,Id objectMappingLayoutId, ObjectMappingLayoutsSelector objectMappingLayoutSelector)
         + ObjectConversionResult convertObject(Id sourceRecordId,ObjectMappingLayout objectMappingLayout)
         - SObject convertParentRecord(Id parentRecordId,ObjectMapping parentObjectMapping)
         - List<SObject> convertRelatedRecords(Id sourceParentRecordId,Id targetParentRecordId,
@@ -197,7 +172,7 @@ package "ObjectMappingTemplateModule"{
     }
    class ObjectMappingLayoutController {
         - {static} ObjectMappingLayoutService OBJECT_MAPPING_LAYOUT_SERVICE
-        - {static} ObjectMappingLayoutUpsertService OBJECT_MAPPING_LAYOUT_UPSERT_SERVICE
+        - {static} ObjectMappingLayoutsSelector OBJECT_MAPPING_LAYOUT_SELECTOR
 
          + {static} List<ObjectMappingLayout> getMappingLayouts()
          + {static} ObjectMappingLayout getMappingLayout(Id recordId)
@@ -214,15 +189,14 @@ package "ObjectMappingTemplateModule"{
         + {static} String convertObjectFromLayout(Id sourceRecordId, Id objectMappingLayoutId)
       }
      ObjectMappingLayoutConverterServiceImpl -u|> ObjectMappingLayoutConverterService
-     ObjectMappingLayoutConverterServiceImpl -u-> ObjectMappingLayoutService
 
      ObjectMappingLayoutController --> ObjectMappingLayoutService
-     ObjectMappingLayoutController --> ObjectMappingLayoutUpsertService
+     ObjectMappingLayoutController --> ObjectMappingLayoutsSelector
      ObjectMappingConverterController --> ObjectMappingLayoutConverterService
+     ObjectMappingConverterController --> ObjectMappingLayoutsSelector
 
 
  }
- ObjectMappingLayoutConverterServiceImpl --> ObjectMappingTemplateConverter
 
 
 }
@@ -230,14 +204,13 @@ package "ObjectMappingTemplateModule"{
 database Database {
         object Object_Mapping_Template__c{
             Name Text(80)
-            Description__c Long Text Area(32768)
+            Description__c Text Area(255)
             Mapping_Data__c	Long Text Area(131072)
             Source_Object_Api_Name__c Text(255)
             Target_Object_Api_Name__c Text(255)
         }
         object Object_Mapping__c{
             External_Id__c Text(255) (External ID)
-            Filter_Condition__c	Long Text Area(131072)
             Filter_State_JSON__c Long Text Area(131072)
             Object_Mapping_Layout__c Master-Detail(Object Mapping Layout)
             Object_Mapping_Template__c	Master-Detail(Object Mapping Template)
@@ -257,8 +230,8 @@ database Database {
         Object_Mapping_Layout__c --> Object_Mapping__c
 
 }
-ObjectMappingTemplateRepository --[hidden]down--> Database
-ObjectMapping --> ObjectMappingTemplate
 
+FilterState --[hidden]down--> ObjectMappingTemplate
+ObjectMappingTemplateService --[hidden]down--> Database
 
 @enduml
