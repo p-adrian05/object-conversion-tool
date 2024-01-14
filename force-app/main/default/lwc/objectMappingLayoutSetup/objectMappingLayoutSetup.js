@@ -99,8 +99,6 @@ export default class ObjectMappingLayoutSetup extends LightningElement {
                     parentMapping:layoutComponent.getParentMappingState(),
                     childMappings:layoutComponent.getChildMappingStates()
                 };
-                console.log('UPSERT LAYOUT:');
-                console.log(JSON.stringify(layoutObject));
 
                 upsertMappingLayout({
                     objectMappingLayoutJSON:JSON.stringify(layoutObject)})
