@@ -1,5 +1,5 @@
 # Object Conversion Tool
-Salesforce SObject Conversion Tool for converting records between different object types with providing a user-friendly interface for configuring the conversion.
+Salesforce SObject Conversion Tool for converting records efficiently between different object types with providing a user-friendly interface for configuring the conversion.
 ## Object Mapping Setup Tool
 The Mapping Setup Tool for setting up custom and standard 
 object field mappings for object conversion can provide a user-friendly interface
