@@ -1,0 +1,57 @@
+<template>
+    <div>
+        <lightning-layout horizontal-align="space">
+            <template if:true={isChild}>
+                <lightning-layout-item class="slds-button_full-width slds-m-left_medium slds-p-right_small">
+                    <c-object-child-relationship-selector
+                            class=" slds-button_full-width "
+                            data-id="sourceObjectRelationshipSelector"
+                            parent-object-api-name={parentSourceObjectApiName}
+                            child-object-api-name={selectedSourceObjectApiName}
+                            source-object-selector="true"
+                            field-style="width:23rem">
+                    </c-object-child-relationship-selector>
+                </lightning-layout-item>
+                <lightning-layout-item class="slds-button_full-width slds-p-left_medium slds-m-right_medium">
+                    <c-object-child-relationship-selector
+                            class=" slds-button_full-width"
+                            data-id="targetObjectRelationshipSelector"
+                            parent-object-api-name={parentTargetObjectApiName}
+                            child-object-api-name={selectedTargetObjectApiName}
+                            field-style="width:14rem">
+                    </c-object-child-relationship-selector>
+                </lightning-layout-item>
+                <lightning-button-icon icon-name="utility:filterList" variant="border-filled"
+                                       disabled={disableAddFiltersButton} class="slds-p-right_medium"
+                                       style="margin-top: 1.3rem"
+                                       onclick={handleAddFilterButton}></lightning-button-icon>
+                <lightning-button-icon icon-name="utility:delete" variant="border-filled" style="margin-top: 1.3rem"
+                                       class="slds-p-right_medium"
+                                       onclick={handleRemoveMappingButton}></lightning-button-icon>
+            </template>
+        </lightning-layout>
+
+
+        <lightning-layout horizontal-align="center" vertical-align="center">
+            <lightning-layout-item>
+                <c-object-mapping-table onmappingtemplatechange={handleMappingTemplateChange}
+                                        source-object-api-names={parentRelatedSourceObjectApiNames}
+                                        target-object-api-names={parentRelatedTargetObjectApiNames}
+                                        template-select-disable={templateSelectDisable}
+                                        read-only="true"
+                                        hide-field-mappings="true">
+                </c-object-mapping-table>
+            </lightning-layout-item>
+        </lightning-layout>
+
+        <template if:true={showFilters}>
+            <div class="line-separator"></div>
+            <lightning-layout class="slds-m-around_medium">
+                <lightning-layout-item>
+                    <c-object-filter object-api-name={selectedSourceObjectApiName}>
+                    </c-object-filter>
+                </lightning-layout-item>
+            </lightning-layout>
+        </template>
+    </div>
+</template>

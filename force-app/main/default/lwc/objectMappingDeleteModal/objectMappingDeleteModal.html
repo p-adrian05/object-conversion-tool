@@ -1,0 +1,18 @@
+<template>
+    <lightning-modal-header label="Delete Mapping"></lightning-modal-header>
+    <lightning-modal-body>
+        <lightning-layout horizontal-align="center">
+            <lightning-layout-item ><p>{content}</p></lightning-layout-item>
+        </lightning-layout>
+    </lightning-modal-body>
+    <lightning-modal-footer>
+        <lightning-layout horizontal-align="center">
+            <lightning-layout-item class="slds-p-right_medium">
+                <lightning-button label="Cancel" onclick={handleCancel} variant="brand"></lightning-button>
+            </lightning-layout-item>
+            <lightning-layout-item class="slds-p-left_medium">
+                <lightning-button label="Delete" onclick={handleOkay} variant="destructive"></lightning-button>
+            </lightning-layout-item>
+        </lightning-layout>
+    </lightning-modal-footer>
+</template>

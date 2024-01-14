@@ -1,0 +1,48 @@
+<template>
+    <lightning-layout>
+        <lightning-layout-item flexibility="no-grow">
+            <c-object-field field-data= {fieldMappingData.sourceObjectField}
+                            class="sourceField"
+                            fields={sourceObjectFields}
+                            onfieldchange={handleSourceObjectFieldChange}
+                            onreferencefieldselected={handleReferenceFieldSelected}
+                            disable-parent-field-rendering={disableParentFieldRendering}
+                            field-style="width:22rem"
+                            >
+            </c-object-field>
+        </lightning-layout-item>
+        <lightning-layout-item flexibility="no-grow" class="slds-p-around_medium slds-m-top_x-small">
+            <lightning-icon
+                    icon-name="standard:output"
+                    alternative-text="No data found"
+                    title="No data found" >
+            </lightning-icon>
+        </lightning-layout-item>
+        <lightning-layout-item flexibility="no-grow">
+            <c-object-field field-data= {fieldMappingData.targetObjectField}
+                            fields={targetObjectFields}
+                            onfieldchange={handleTargetObjectFieldChange}
+                            disabled-active="false"
+                            field-style={targetObjectFieldStyle}
+            >
+            </c-object-field>
+        </lightning-layout-item>
+        <lightning-layout-item  flexibility="no-grow" class="slds-p-top_medium slds-m-top_x-small slds-m-left_small" >
+            <lightning-button-icon
+                    icon-name="action:remove"
+                    alternative-text="Delete"
+                    onclick={handleDeleteFieldMappingData}
+                    class="slds-m-left_xx-small"
+                    title="Delete"></lightning-button-icon>
+        </lightning-layout-item>
+        <template lwc:if={referenceFieldSelected}>
+            <lightning-layout-item flexibility="no-grow" class="slds-p-top_medium slds-m-top_x-small slds-m-left_small"  >
+                <lightning-button-icon
+                        icon-name={openCloseButtonIconName}
+                        variant="border-filled"
+                        onclick={handleCloseParentMappingButtonClicked}>
+                </lightning-button-icon>
+            </lightning-layout-item>
+        </template>
+    </lightning-layout>
+</template>

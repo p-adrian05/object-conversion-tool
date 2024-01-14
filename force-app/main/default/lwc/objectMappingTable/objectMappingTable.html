@@ -1,0 +1,100 @@
+<template>
+    <lightning-card title={title} class="slds-align_absolute-center mapping-body">
+        <template if:true={isLoading}>
+            <lightning-spinner alternative-text="Loading" variant="brand"></lightning-spinner>
+        </template>
+        <div class="slds-p-left_medium slds-p-right_medium mapping-body">
+            <template if:false={readOnly}>
+                <lightning-layout horizontal-align="spread">
+                    <lightning-layout-item class="">
+                        <lightning-layout horizontal-align="start">
+                            <lightning-layout-item>
+                                <lightning-button
+                                        variant="brand"
+                                        label={labels.templateSaveButtonLabel}
+                                        class="slds-m-right_medium"
+                                        onclick={handleSaveButtonClick}>
+                                </lightning-button>
+                            </lightning-layout-item>
+                            <lightning-layout-item>
+                                <lightning-button variant="brand-outline"
+                                                  label={labels.templateReloadButtonLabel}
+                                                  class="slds-m-right_medium"
+                                                  onclick={handleRestoreButtonClick}>
+                                </lightning-button>
+                            </lightning-layout-item>
+                            <lightning-layout-item>
+                                <lightning-button variant="destructive"
+                                                  label={labels.templateDeleteButtonLabel}
+                                                  disabled={templateSelectDisable}
+                                                  onclick={handleDeleteModalClick}>
+                                </lightning-button>
+                            </lightning-layout-item>
+                        </lightning-layout>
+                    </lightning-layout-item>
+                    <lightning-layout-item>
+                        <lightning-layout horizontal-align="end">
+                            <lightning-layout-item flexibility="auto">
+                                <lightning-button variant="brand"
+                                                  label={labels.templateCreateNewButtonLabel}
+                                                  disabled={templateSelectDisable}
+                                                  onclick={handleResetButtonClick}>
+                                </lightning-button>
+                            </lightning-layout-item>
+                        </lightning-layout>
+                    </lightning-layout-item>
+                </lightning-layout>
+            </template>
+
+            <lightning-layout horizontal-align="center">
+                <lightning-layout-item flexibility="no-grow" class=" slds-button_full-width">
+                    <lightning-combobox
+                            name="objectMappingTemplates"
+                            value={selectedMappingTemplateId}
+                            placeholder={labels.templateSelectorPlaceholder}
+                            options={mappingTemplateOptions}
+                            disabled={templateSelectDisable}
+                            onchange={handleMappingTemplateOptionChange}
+                            class='slds-button_full-width'
+                    ></lightning-combobox>
+                </lightning-layout-item>
+                <template if:false={readOnly}>
+                    <lightning-layout-item flexibility="no-grow" class="slds-m-left_medium slds-button_full-width ">
+                        <lightning-input id="mappingTemplateNameInput"
+                                         type="text"
+                                         placeholder={labels.templateNameInputPlaceholder}
+                                         label=""
+                                         disabled={templateSelectDisable}
+                                         max-length="255"
+                                         value={selectedMappingTemplateName}
+                                         onchange={handleMappingTemplateNameInputChange}
+                                         class='slds-button_full-width'>
+
+                        </lightning-input>
+                    </lightning-layout-item>
+                </template>
+            </lightning-layout>
+            <template lwc:if={readOnly}>
+                <template if:true={selectedMappingTemplateId}>
+                    <c-object-mapping-form onloading={handleLoading}
+                                           read-only={readOnly}
+                                           ondoneloading={handleDoneLoading}
+                                           onmappingtemplateloaded={handleTemplateLoaded}
+                                           source-object-api-names={sourceObjectApiNames}
+                                           target-object-api-names={targetObjectApiNames}
+                                           hide-field-mappings={hideFieldMappings}
+                    ></c-object-mapping-form>
+                </template>
+            </template>
+            <template lwc:else>
+                <c-object-mapping-form onloading={handleLoading}
+                                       ondoneloading={handleDoneLoading}
+                                       onmappingtemplateloaded={handleTemplateLoaded}
+                                       source-object-api-names={sourceObjectApiNames}
+                                       target-object-api-names={targetObjectApiNames}
+                                       hide-field-mappings={hideFieldMappings}
+                ></c-object-mapping-form>
+            </template>
+        </div>
+    </lightning-card>
+</template>

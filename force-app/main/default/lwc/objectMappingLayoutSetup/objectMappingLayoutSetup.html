@@ -1,0 +1,71 @@
+<template>
+    <lightning-card title={title} class="slds-card_boundary  slds-align_absolute-center mapping-layout-body">
+        <template if:true={isLoading}>
+            <lightning-spinner alternative-text="Loading" variant="brand"></lightning-spinner>
+        </template>
+        <div class="slds-p-left_medium slds-p-right_medium mapping-layout-body">
+            <lightning-layout horizontal-align="spread">
+                <lightning-layout-item class="">
+                    <lightning-layout horizontal-align="start">
+                        <lightning-layout-item>
+                            <lightning-button class="slds-m-right_medium" variant="brand" label={labels.layoutSaveButtonLabel}
+                                              onclick={handleSaveButtonClick}></lightning-button>
+                        </lightning-layout-item>
+                        <lightning-button variant="brand-outline"
+                                          label={labels.layoutReloadButtonLabel}
+                                          class="slds-m-right_medium"
+                                          onclick={handleRestoreButtonClick}>
+                        </lightning-button>
+                        <lightning-layout-item>
+                            <lightning-button class="slds-m-right_medium" variant="destructive" label={labels.layoutDeleteButtonLabel}
+                                              onclick={handleDeleteButtonClick}></lightning-button>
+                        </lightning-layout-item>
+                    </lightning-layout>
+                </lightning-layout-item>
+                <lightning-layout-item>
+                    <lightning-layout horizontal-align="end">
+                        <lightning-layout-item flexibility="auto">
+                            <lightning-button variant="brand" label={labels.layoutCreateNewButtonLabel}
+                                              onclick={handleResetButtonClick}></lightning-button>
+                        </lightning-layout-item>
+                    </lightning-layout>
+                </lightning-layout-item>
+            </lightning-layout>
+            <lightning-layout horizontal-align="center">
+                <lightning-layout-item flexibility="no-grow" class=" slds-button_full-width">
+                    <lightning-combobox
+                            class='slds-button_full-width'
+                            value={selectedMappingLayoutId}
+                            placeholder={labels.layoutSelectorPlaceholder}
+                            options={mappingLayoutOptions}
+                            onchange={handleMappingLayoutOptionChange}
+                    ></lightning-combobox>
+                </lightning-layout-item>
+                <lightning-layout-item flexibility="no-grow" class="slds-m-left_medium slds-button_full-width ">
+                    <lightning-input
+                            class='slds-button_full-width'
+                            type="text"
+                            placeholder={labels.layoutNameInputPlaceholder}
+                            label=""
+                            max-length="255"
+                            value={mappingLayoutName}
+                            onchange={handleMappingLayoutNameInputChange}>
+                    </lightning-input>
+                </lightning-layout-item>
+            </lightning-layout>
+            <lightning-textarea
+                    class='slds-button_full-width'
+                    id="descriptionInput"
+                    placeholder={labels.layoutDescriptionInputPlaceholder}
+                    max-length="255"
+                    value={mappingLayoutDescription}
+                    onchange={handleMappingLayoutDescriptionChange}
+                    label="">
+            </lightning-textarea>
+        </div>
+        <c-object-mapping-layout layout-record-id={selectedMappingLayoutId}>
+        </c-object-mapping-layout>
+    </lightning-card>
+
+
+</template>

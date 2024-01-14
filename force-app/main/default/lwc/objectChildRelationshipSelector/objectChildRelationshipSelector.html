@@ -1,0 +1,10 @@
+<template>
+        <lightning-combobox
+                class="slds-button_full-width"
+                style={fieldStyle}
+                value={selectedChildRelationshipFieldApiName}
+                placeholder={labels.relationshipSelectorPlaceholderText}
+                options={childRelationshipOptions}
+                onchange={handleChildRelationshipChange}
+                validity=""></lightning-combobox>
+</template>

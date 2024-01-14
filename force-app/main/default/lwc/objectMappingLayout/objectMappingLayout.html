@@ -1,0 +1,43 @@
+<template>
+    <template if:true={isLoading}>
+        <lightning-spinner alternative-text="Loading" variant="brand"></lightning-spinner>
+    </template>
+    <lightning-card class="slds-card_boundary slds-align_absolute-center slds-m-around_medium">
+        <lightning-layout horizontal-align="center">
+            <lightning-layout-item flexibility="no-flex">
+                <c-object-mapping onmappingtempaltechange={handleParentMappingChange}
+                                  template-select-disable={parentTemplateSelectDisable}
+                                  object-mapping-state={parentMappingState}
+                                  data-id="parentMapping"
+                >
+                </c-object-mapping>
+            </lightning-layout-item>
+        </lightning-layout>
+        <lightning-layout horizontal-align="center" class="slds-m-around_medium">
+            <lightning-layout-item flexibility="no-flex">
+                <lightning-button variant="brand-outline" label={labels.addChildMappingButtonLabel}
+                                  disabled={disableAddChildButton}
+                                  onclick={handleAddChildButtonClicked}></lightning-button>
+            </lightning-layout-item>
+        </lightning-layout>
+        <template if:true={selectedParentMappingTemplate}>
+            <template for:each={childMappingStates} for:item="mappingState">
+                <lightning-layout key={mappingState.externalId} class="slds-m-around_medium">
+                    <lightning-card class="slds-card_boundary slds-align_absolute-center  ">
+                        <c-object-mapping object-mapping-state={mappingState}
+                                          parent-related-source-object-api-names={parentRelatedSourceObjectApiNames}
+                                          parent-related-target-object-api-names={parentRelatedTargetObjectApiNames}
+                                          parent-source-object-api-name={selectedParentSourceObjectApiName}
+                                          parent-target-object-api-name={selectedParentTargetObjectApiName}
+                                          onremovemapping={handleRemoveChildMapping}
+                                          template-select-disable={parentTemplateSelectDisable}
+                                          class="childMapping"
+                                          is-child="true"
+                        >
+                        </c-object-mapping>
+                    </lightning-card>
+                </lightning-layout>
+            </template>
+        </template>
+    </lightning-card>
+</template>

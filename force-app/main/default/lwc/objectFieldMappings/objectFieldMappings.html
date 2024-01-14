@@ -1,0 +1,35 @@
+<template>
+    <template if:true={isLoading}>
+        <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+    </template>
+    <lightning-layout horizontal-align="center" class="slds-p-top_medium">
+        <lightning-layout-item flexibility="auto">
+            <template if:true={mappingFieldsVisible}>
+                <lightning-button-icon icon-name="utility:add" variant="border-filled" onclick={handleAddFieldMappingButtonClicked}></lightning-button-icon>
+            </template>
+        </lightning-layout-item>
+    </lightning-layout>
+    <template if:true={mappingFieldsVisible}>
+        <template if:true={fieldMappingDataList}>
+            <div >
+                <template for:each={fieldMappingDataList} for:item="fieldMappingData">
+                    <c-object-field-mapping key={fieldMappingData.key}
+                                            field-mapping-data={fieldMappingData.value}
+                                            source-object-fields= {sourceObjectFields}
+                                            target-object-fields= {targetObjectFields}
+                                            onfieldmappingdatachange={handleFieldMappingDataChange}
+                                            onfieldmappingdatadelete={handleFieldMappingDataDelete}
+                    >
+                    </c-object-field-mapping>
+                    <div key={fieldMappingData.key} class="line-separator"></div>
+                </template>
+            </div>
+
+        </template>
+    </template>
+        <lightning-layout horizontal-align="end" class="slds-p-top_medium">
+                <lightning-layout-item flexibility="auto"  >
+                    <lightning-button-icon icon-name={openCloseButtonIconName} variant="border-filled" onclick={handleCloseMappingButtonClicked}></lightning-button-icon>
+                </lightning-layout-item>
+        </lightning-layout>
+</template>

@@ -1,0 +1,6 @@
+.mapping-layout-body{
+    width: 55rem;
+}
+:host {
+    --sds-c-textarea-sizing-min-height: 5rem;
+}

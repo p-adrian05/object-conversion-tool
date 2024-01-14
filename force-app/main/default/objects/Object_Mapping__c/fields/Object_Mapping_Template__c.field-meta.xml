@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Object_Mapping_Template__c</fullName>
+    <externalId>false</externalId>
+    <label>Object Mapping Template</label>
+    <referenceTo>Object_Mapping_Template__c</referenceTo>
+    <relationshipLabel>Object Mappings</relationshipLabel>
+    <relationshipName>Object_Mappings</relationshipName>
+    <relationshipOrder>1</relationshipOrder>
+    <reparentableMasterDetail>true</reparentableMasterDetail>
+    <trackTrending>false</trackTrending>
+    <type>MasterDetail</type>
+    <writeRequiresMasterRead>false</writeRequiresMasterRead>
+</CustomField>

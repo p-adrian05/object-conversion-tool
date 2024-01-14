@@ -1,0 +1,46 @@
+<template>
+    <lightning-combobox class="validate field"
+                        style={fieldStyle}
+                        name={fieldData.labelName}
+                        label=""
+                        value={fieldData.apiName}
+                        placeholder={labels.fieldSelectorPlaceholderText}
+                        required
+                        disabled={disabled}
+                        options={fieldOptions}
+                        onchange={handleFieldOptionChange}
+    ></lightning-combobox>
+    <template if:true={fieldData.type}>
+        <div class="slds-m-left_xx-small">
+            <lightning-layout>
+                <lightning-layout-item flexibility="grow">
+                    <div class="detail-span slds-m-right_large">{fieldData.apiName}</div>
+                </lightning-layout-item>
+                <lightning-layout-item flexibility="grow">
+                    <div class="detail-span ">{fieldData.type}</div>
+                </lightning-layout-item>
+            </lightning-layout>
+        </div>
+    </template>
+    <template if:false={disabledActive}>
+        <template if:false={disableParentFieldRendering}>
+            <template if:true={fieldData}>
+                <template if:true={fieldData.referenceTo}>
+                    <lightning-layout>
+                        <lightning-layout-item class="slds-m-top_medium slds-p-top_xx-small">
+                            <lightning-icon
+                                    icon-name="utility:level_down"
+                                    alternative-text="level down"
+                                    title="level down">
+                            </lightning-icon>
+                        </lightning-layout-item>
+                        <lightning-layout-item flexibility="grow">
+                            <c-object-field child-field={fieldData}
+                                            onfieldchange={handleFieldOptionChangeOnChild}></c-object-field>
+                        </lightning-layout-item>
+                    </lightning-layout>
+                </template>
+            </template>
+        </template>
+    </template>
+</template>

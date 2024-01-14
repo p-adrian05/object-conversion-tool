@@ -1,0 +1,66 @@
+<template>
+    <div class=" slds-align_absolute-center filter-body ">
+
+        <div class="slds-m-around-medium">
+            <h2><b>{title}</b></h2>
+            <lightning-layout class="filter-body">
+            </lightning-layout>
+            <c-object-filter-form
+                    object-api-name={objectApiName}
+                    operator-options={operatorOptions}
+                    logical-conditions={logicalConditions}
+                    selected-logical-condition={selectedLogicalCondition}
+                    onlogicalconditionchange={handleLogicalConditionSelected}
+            ></c-object-filter-form>
+            <lightning-layout horizontal-align="start" class="slds-m-top_medium">
+                <template if:true={editFilter}>
+                    <lightning-layout-item>
+                        <lightning-button label={labels.cancelButtonLabel} class="slds-m-right_medium" onclick={handleClearFilterButton}></lightning-button>
+                    </lightning-layout-item>
+                </template>
+                <template if:true={editFilter}>
+                    <lightning-layout-item>
+                        <lightning-button label={labels.updateButtonLabel} onclick={handleUpdateFilterButton}
+                                          variant="brand"></lightning-button>
+                    </lightning-layout-item>
+                </template>
+                <template if:false={editFilter}>
+                    <lightning-layout-item>
+                        <lightning-button label={labels.addNewFilterButtonLabel} onclick={handleAddFilterButton}
+                                          variant="brand"></lightning-button>
+                    </lightning-layout-item>
+                </template>
+            </lightning-layout>
+            <template if:true={showCustomConditionLogicInput}>
+                <lightning-layout >
+                    <lightning-layout-item class="slds-button_full-width slds-m-top_small" flexibility="auto">
+                        <lightning-input
+                                class="slds-button_full-width"
+                                type="text"
+                                onchange={handleCustomConditionLogicInput}
+                                value={customLogicalCondition}
+                                label={labels.logicalOrderInputLabel}>
+                        </lightning-input>
+                    </lightning-layout-item>
+                </lightning-layout>
+
+            </template>
+                <template if:true={queryString}>
+                    <lightning-layout class="slds-button_full-width">
+                        <lightning-layout-item class="slds-button_full-width" flexibility="auto">
+                            <lightning-textarea
+                                    class="slds-button_full-width"
+                                    value={queryString}
+                                    read-only="true"
+                            ></lightning-textarea>
+                        </lightning-layout-item>
+                    </lightning-layout>
+                </template>
+                <c-object-filters
+                        filters={filterList}
+                        onselectfilter={handleSelectFilter}
+                        onremovefilter={handleRemoveFilter}
+                ></c-object-filters>
+        </div>
+    </div>
+</template>

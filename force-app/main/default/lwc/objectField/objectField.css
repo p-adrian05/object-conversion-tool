@@ -1,0 +1,10 @@
+.detail-span{
+    font-size:.6rem;
+    border-radius: 5rem;
+    background-color: #eaeaea;
+    padding-left:.5rem;
+    color:black;
+    font-weight: normal;
+    margin-top:.5rem;
+    margin-bottom:.2rem;
+}

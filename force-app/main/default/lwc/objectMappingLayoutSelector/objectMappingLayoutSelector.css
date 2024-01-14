@@ -1,0 +1,6 @@
+.layout-selector-body{
+    width: 25rem;
+}
+:host {
+    --sds-c-textarea-sizing-min-height: 5rem;
+}

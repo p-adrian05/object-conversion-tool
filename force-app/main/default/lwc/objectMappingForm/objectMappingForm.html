@@ -1,0 +1,54 @@
+<template>
+        <lightning-textarea
+                id="descriptionInput"
+                placeholder={labels.descriptionTextAreaPlaceholder}
+                max-length="255"
+                label=""
+                value={mappingTemplateDescription}
+                onchange={handleMappingTemplateDescriptionChange}
+                read-only={readOnly}
+        >
+        </lightning-textarea>
+
+         <lightning-layout horizontal-align="center">
+            <lightning-layout-item flexibility="no-grow" class="slds-button_full-width">
+                <lightning-combobox name="sourceObjects"
+                                    class="slds-button_full-width"
+                                    label={labels.sourceObjectSelectorLabel}
+                                    disabled={objectMappingTemplateId}
+                                    value={selectedSourceObjectApiName}
+                                    placeholder={labels.sourceObjectSelectorPlaceholder}
+                                    options={sourceObjectOptions}
+                                    onchange={handleSourceObjectChange}
+                ></lightning-combobox>
+            </lightning-layout-item>
+            <lightning-layout-item flexibility="no-grow" >
+                <lightning-icon
+                        class="slds-m-left_medium slds-m-right_medium slds-m-top_large"
+                        icon-name="standard:macros"
+                        alternative-text="No data found"
+                        title="No data found"
+                >
+                </lightning-icon>
+            </lightning-layout-item>
+            <lightning-layout-item flexibility="no-grow" class="slds-button_full-width">
+                <lightning-combobox name="targetObjects"
+                                    class="slds-button_full-width"
+                                    label={labels.targetObjectSelectorLabel}
+                                    disabled={objectMappingTemplateId}
+                                    value={selectedTargetObjectApiName}
+                                    placeholder={labels.targetObjectSelectorPlaceholder}
+                                    options={targetObjectOptions}
+                                    onchange={handleTargetObjectChange}
+                ></lightning-combobox>
+            </lightning-layout-item>
+        </lightning-layout>
+        <template if:true={showFieldMappings}>
+            <c-object-field-mappings source-object-api-name= {selectedSourceObjectApiName}
+                                     target-object-api-name= {selectedTargetObjectApiName}
+                                     field-mapping-data-list={fieldMappingDataList}
+                                     init-required-fields={initRequiredFields}
+            ></c-object-field-mappings>
+        </template>
+
+</template>

@@ -1,0 +1,51 @@
+<template>
+    <template if:true={isLoading}>
+        <lightning-spinner alternative-text="Loading"></lightning-spinner>
+    </template>
+    <div class="slds-align_absolute-center">
+        <lightning-layout>
+            <c-object-mapping-layout-selector
+                    onselectedlayoutchange={handleMappingLayoutChange}
+                    object-mapping-layouts={objectMappingLayouts}
+            ></c-object-mapping-layout-selector>
+        </lightning-layout>
+    </div>
+    <div>
+        <lightning-layout class="slds-m-top_xx-large button-footer" horizontal-align="end">
+            <template if:true={selectedObjectMappingLayoutId}>
+                <template if:false={selectedObjectMappingLayoutIsDefault}>
+                    <template if:true={isCurrentUserAdmin}>
+                        <lightning-layout-item>
+                            <lightning-button variant="neutral" label={labels.markDefaultButtonLabel}
+                                              onclick={handleDefaultButtonClick}></lightning-button>
+                        </lightning-layout-item>
+                    </template>
+                </template>
+                <template if:true={selectedObjectMappingLayoutIsDefault}>
+                    <template if:true={isCurrentUserAdmin}>
+                        <lightning-layout-item>
+                            <lightning-button variant="neutral" label={labels.defaultSelectedButtonLabel}
+                                              disabled></lightning-button>
+                        </lightning-layout-item>
+                    </template>
+                </template>
+            </template>
+            <template if:false={createdTargetRecordId}>
+                <lightning-layout-item>
+                    <lightning-button
+                            class="slds-m-left_medium"
+                            variant="brand" label={labels.convertButtonLabel}
+                            onclick={handleConvertButtonClick}>
+
+                    </lightning-button>
+                </lightning-layout-item>
+            </template>
+            <template if:true={createdTargetRecordId}>
+                <lightning-layout-item>
+                    <lightning-button class="slds-m-left_medium" variant="brand" label={labels.viewCreatedRecordButtonLabel}
+                                      onclick={handleViewCreatedRecordButtonClick}></lightning-button>
+                </lightning-layout-item>
+            </template>
+        </lightning-layout>
+    </div>
+</template>
