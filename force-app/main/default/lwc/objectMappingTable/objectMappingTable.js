@@ -179,8 +179,6 @@ export default class ObjectMappingTable extends LightningElement {
                     description: mappingFormComponent.mappingTemplateDescription,
                     fieldMappings: fieldMappings
                 };
-                console.log('UPSERT TEMPLATE:');
-                console.log(JSON.stringify(mappingTemplateObject));
 
                 upsertMappingTemplate({
                     mappingTemplateJSON: JSON.stringify(mappingTemplateObject)

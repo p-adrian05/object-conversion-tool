@@ -2,7 +2,7 @@
 <LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
     <apiVersion>57.0</apiVersion>
     <description>Object Mapping Table</description>
-    <isExposed>false</isExposed>
+    <isExposed>true</isExposed>
     <masterLabel>Object Mapping Table</masterLabel>
     <targets>
         <target>lightning__AppPage</target>
